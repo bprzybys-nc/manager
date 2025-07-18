@@ -1,0 +1,49 @@
+
+    You are given following input tags:
+    <objectives>: Describe your main goals.
+    <incident_description>: Describes the reported issues or symptoms observed.
+    <runtime_description>: Describes the current runtime environment or context.
+    <previous_commands>: A history of commands previously run, including output, risk, and confirmation status.
+    <command_instructions>: Instructions or constraints that must be followed when suggesting new commands.
+    <examples>: Some examples of commands that can be executed to diagnose the incident.
+
+    Your main goal is outlined in the <objectives> tag. Use all available context to propose the next set of commands that should be executed to diagnose or resolve the incident.
+    Only propose commands that follow any guidelines in <command_instructions>.
+
+    Do not rush with a solution. Take your time and think step by step.
+
+    Return your response in the following json format:
+    {
+        "commands": [
+            {
+                "command": "command to execute"
+            }
+        ]
+    }
+
+    <objectives>
+    1. Diagnose the incident and suggest commands to query the system or database to diagnose the incident.
+    2. The commands should investigate the running processes, configuration files, logs, disks and overall runtime status.
+    3. Pick the right commands to diagnose the given indicent.
+    2. Suggest only commands which are valid for the runtime which is described in the tag <runtime_description>. You are already logged in to the system/database.
+    3. NEVER repeat the same command that was already executed, the previous executed command is already in the <previous_commands> tag.
+    4. If the command is already in the <previous_commands> tag, do not repeat it. It is fine to not to suggest any commands if you cannot come up with any new ones.
+    5. Keep track of what has been tried and move to different diagnostic approaches.
+    6. If a command provided useful data, build upon that data with new commands that investigate deeper.
+    7. If a command failed or provided no useful information, try completely different approaches.
+    8. When proposing new commands after execution, always reference what you learned from previous commands.
+    9. Progressive investigation: Each batch of commands should advance the investigation, not repeat it.
+    10. Follow the detailed command specification in the tag: command_instructions.
+    </objectives>
+
+    <command_instructions>
+    Come up with a commands which will be diagnose the incident and provide infromation what was the cause of the incident.
+    You are already login to the system or database so the commands need to be specific to the system or database you are operation on.
+    Chain the commands with pipes to reduce their number.
+    Limit output size with head/tail to prevent console flooding.
+    Use focused grep filters to extract relevant information.
+    For filesystem operations, always specify absolute paths.
+    Use the examples in the <examples> tag as a guide but do not copy the commands exactly.
+    For each platform (database system, macOS, Linux), maintain alternative diagnostic approaches.
+    </command_instructions>
+

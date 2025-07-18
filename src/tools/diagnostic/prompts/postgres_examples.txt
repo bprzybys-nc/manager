@@ -1,0 +1,47 @@
+    <examples>
+        <command_example>
+            <purpose>high CPU usage detection</purpose>
+            <command>SELECT pid, usename, now() - query_start AS duration, state, query FROM pg_stat_activity WHERE state = 'active' ORDER BY duration DESC LIMIT 5;</command>
+            <description>
+            Identifies long-running active queries
+            High CPU load often linked to long or complex queries
+            Prioritized by query duration
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>disk I/O hotspots (by table)</purpose>
+            <command>SELECT relname, seq_scan, idx_scan, n_tup_ins, n_tup_upd, n_tup_del FROM pg_stat_user_tables ORDER BY n_tup_upd + n_tup_del DESC LIMIT 5;</command>
+            <description>
+            Finds tables with frequent writes (updates/deletes)
+            High write rates can cause disk pressure
+            Helps locate I/O-heavy tables
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>largest tables (potential disk pressure)</purpose>
+            <command>SELECT relname, pg_size_pretty(pg_total_relation_size(relid)) AS total_size FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC LIMIT 5;</command>
+            <description>
+            Lists largest tables by size
+            Large tables can cause heavy I/O during scans
+            Useful for disk space and vacuum planning
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>deadlocks (can increase CPU load)</purpose>
+            <command>SELECT * FROM pg_stat_database WHERE deadlocks > 0;</command>
+            <description>
+            Detects deadlock issues
+            Deadlocks cause high CPU usage due to retries
+            Quick global health indicator
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>tables needing vacuuming (to reduce disk bloat)</purpose>
+            <command>SELECT relname, n_dead_tup FROM pg_stat_user_tables WHERE n_dead_tup > 1000 ORDER BY n_dead_tup DESC LIMIT 5;</command>
+            <description>
+            Finds tables with many dead tuples
+            Dead rows waste disk space and slow queries
+            Helps prioritize vacuum operations
+            </description>
+        </command_example>
+    </examples>

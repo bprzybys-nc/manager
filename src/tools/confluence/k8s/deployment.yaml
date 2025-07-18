@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confluence-tool
+  labels:
+    app: confluence-tool
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: confluence-tool
+  template:
+    metadata:
+      labels:
+        app: confluence-tool
+    spec:
+      containers:
+      - name: confluence-tool
+        image: confluence-tool:latest
+        ports:
+        - containerPort: 8005
+        env:
+        - name: CONFLUENCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: confluence-secrets
+              key: confluence-url
+        - name: CONFLUENCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: confluence-secrets
+              key: confluence-username
+        - name: CONFLUENCE_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: confluence-secrets
+              key: confluence-api-token
+        - name: CHROMA_PERSIST_DIRECTORY
+          value: "/app/chroma"
+        - name: EMBEDDING_MODEL
+          value: "all-MiniLM-L6-v2"
+        - name: API_HOST
+          value: "0.0.0.0"
+        - name: API_PORT
+          value: "8005"
+        - name: LOG_LEVEL
+          value: "INFO"
+        volumeMounts:
+        - name: chroma-storage
+          mountPath: /app/chroma
+        - name: logs-storage
+          mountPath: /app/logs
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8005
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/detailed
+            port: 8005
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: chroma-storage
+        persistentVolumeClaim:
+          claimName: chroma-pvc
+      - name: logs-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: confluence-tool-service
+  labels:
+    app: confluence-tool
+spec:
+  selector:
+    app: confluence-tool
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8005
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chroma-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: confluence-secrets
+type: Opaque
+stringData:
+  confluence-url: "https://your-domain.atlassian.net"
+  confluence-username: "your-email@domain.com"
+  confluence-api-token: "your-api-token"

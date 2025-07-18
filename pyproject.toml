@@ -1,0 +1,26 @@
+[project]
+name = "sysaidmin-manager"
+version = "0.1.0"
+description = "Sysaidmin manager"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.11.12",
+    "apscheduler>=3.11.0",
+    "celery[redis]>=5.4.0",
+    "fastapi>=0.115.6",
+    "grandalf>=0.8",
+    "langchain>=0.3.17",
+    "langchain-openai>=0.3.0",
+    "langfuse>=2.59.3",
+    "langgraph>=0.2.62",
+    "langgraph-checkpoint-mongodb>=0.1.0",
+    "openai>=1.59.5",
+    "prometheus-api-client>=0.5.5",
+    "prometheus-client>=0.21.1",
+    "pymongo==4.11.0",
+    "requests>=2.32.3",
+    "slack-bolt>=1.22.0",
+    "streamlit>=1.43.2",
+    "uvicorn>=0.34.0",
+]

@@ -1,0 +1,84 @@
+    <examples>
+        <command_example>
+            <purpose>disk diagnostics</purpose>
+            <command>df -h; du -sh /* 2>/dev/null | sort -hr | head -10</command>
+            <description>
+            Combines related diagnostics
+            Includes error handling
+            Limits output with head
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>process investigation</purpose>
+            <command>ps aux | grep nginx | grep -v grep</command>
+            <description>
+            Targeted to specific service
+            Filters out grep process itself
+            Non-invasive read-only operation
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>log analysis</purpose>
+            <command>grep -i error /var/log/syslog | tail -100</command>
+            <description>
+            Focused search term
+            Limited output quantity
+            Standard log location
+            </description>
+        </command_example>
+          <command_example>
+        <purpose>PostgreSQL log analysis</purpose>
+            <command>grep -iE "fatal|panic|shutdown" /var/log/postgresql/postgresql-14-main.log | tail -50</command>
+            <description>
+            Focused on critical failure indicators
+            Limits output for quick review
+            Targets standard PostgreSQL log file
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>system journal inspection for PostgreSQL service</purpose>
+            <command>sudo journalctl -u postgresql --since "2 hours ago"</command>
+            <description>
+            Time-scoped investigation
+            Targets specific service unit
+            Useful for recent crashes or shutdowns
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>detect Out Of Memory (OOM) kills</purpose>
+            <command>dmesg | grep -i oom</command>
+            <description>
+            Filters for critical memory-related events
+            Kernel-level diagnostics
+            Detects if OOM killer terminated PostgreSQL
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>basic PostgreSQL service status check</purpose>
+            <command>systemctl status postgresql</command>
+            <description>
+            Shows current status and last errors
+            Identifies if service is active, failed, or dead
+            Useful for immediate troubleshooting
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>search for PostgreSQL errors in system logs</purpose>
+            <command>grep -i postgres /var/log/syslog | tail -50</command>
+            <description>
+            Targets PostgreSQL-specific entries
+            Limits results for quick review
+            Investigates non-database originated issues
+            </description>
+        </command_example>
+        <command_example>
+            <purpose>recent history review for admin actions</purpose>
+            <command>history | tail -50</command>
+            <description>
+            Checks for recent administrative actions
+            Useful to detect manual restarts or updates
+            Lightweight and very fast
+            </description>
+        </command_example>
+
+    </examples>

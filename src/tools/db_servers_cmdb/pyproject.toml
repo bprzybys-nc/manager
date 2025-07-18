@@ -1,0 +1,14 @@
+[project]
+name = "db_servers_cmdb"
+version = "0.1.0"
+description = "Tool which manage db servers cmdb"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.11.12",
+    "fastapi>=0.115.6",
+    "grandalf>=0.8",
+    "pymongo==4.12.0",
+    "requests>=2.32.3",
+    "uvicorn>=0.34.0",
+]

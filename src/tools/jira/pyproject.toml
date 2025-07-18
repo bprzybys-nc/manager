@@ -1,0 +1,25 @@
+[project]
+name = "jira_tool"
+version = "0.1.0"
+description = "A tool to interact with Jira tickets."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.6",
+    "uvicorn>=0.34.0",
+    "jira>=3.6.0",
+    "pydantic>=2.0.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "python-dotenv>=0.21.0"
+]
+
+[dependency-groups]
+dev = [
+    "jira-tool",
+]
+
+[tool.uv.sources]
+jira-tool = { workspace = true }
