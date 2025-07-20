@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# Virtual environment
+.venv/
+venv/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# Environment variables
+.env
+
+# Version number artifacts (created during dependency resolution)
+=*
+=0.1.0
+=0.21.0
+=1.5.0
+=3.3.0
+=3.4.0
+=3.11.0
+=4.1.0
+=5.9.0
+=6.82.0
+=7.4.0
+=23.0.0
+
+# Logs
+*.log
+dbworkflow.log
+
+# Test results
+test-results-*.xml
+.coverage
+htmlcov/
+
+# macOS
+.DS_Store
+
+# Temporary files
+tmp_*.md
+tmp/
