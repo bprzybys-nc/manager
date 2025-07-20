@@ -52,3 +52,7 @@ htmlcov/
 # Temporary files
 tmp_*.md
 tmp/
+
+# Repomix output
+manager-codebase.xml
+repomix-output.xml
