@@ -9,10 +9,10 @@ from unittest.mock import Mock, AsyncMock, patch
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from ...app.api.routes import DatabaseDecommissioningRoute
-from ...app.models import (
-    DatabaseDecommissionRequest,
-    DatabaseDecommissionResponse,
+from app.api.routes import DatabaseDecommissioningRoute
+from app.models import (
+    WorkflowExecutionRequest,
+    WorkflowExecutionResultResponse,
     WorkflowExecutionResult,
     WorkflowConfig,
 )

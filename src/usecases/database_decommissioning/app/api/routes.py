@@ -31,13 +31,13 @@ from src.modules.task.db import TaskDB
 
 # Local imports
 from ..models import (
-    DatabaseDecommissionRequest,
-    DatabaseDecommissionResponse,
+    WorkflowExecutionRequest,
+    WorkflowExecutionResultResponse,
     WorkflowConfig, 
     WorkflowExecutionResult,
 )
 from ..orchestrator import DatabaseDecommissionOrchestrator
-from ..utils import create_logger_for_workflow, validate_environment_dependencies
+from ..utils import create_logger_for_workflow, validate_workflow_parameters
 from ..validation.environment_validation import EnvironmentValidator
 from ..validation.workflow_validation import WorkflowValidator
 

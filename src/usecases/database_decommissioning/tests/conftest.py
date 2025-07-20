@@ -15,13 +15,17 @@ from unittest.mock import Mock, AsyncMock
 project_root = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+# Add database_decommissioning directory to path for local imports
+local_root = Path(__file__).parent.parent
+sys.path.insert(0, str(local_root))
+
 # Manager imports for fixtures
-from src.config import Config
+import src.config as config
 from src.database.client import DatabaseClient
 
 # Local imports
-from ..app.models import WorkflowConfig, WorkflowExecutionResult
-from ..app.utils import create_logger_for_workflow
+from app.models import WorkflowConfig, WorkflowExecutionResult
+from app.utils import create_logger_for_workflow
 
 
 # Core fixtures from GraphMCP pattern
@@ -53,13 +57,13 @@ def test_workflow_id():
 @pytest.fixture
 def mock_manager_config():
     """Mock Manager configuration."""
-    config = Mock(spec=Config)
-    config.MONGO_DB_URI = "mongodb://localhost:27017/test_db"
-    config.AZURE_OPENAI_API_KEY = "test_api_key"
-    config.AZURE_OPENAI_ENDPOINT = "https://test.openai.azure.com/"
-    config.PROMETHEUS_ADDRESS = "http://localhost:9090"
-    config.MANAGER_API_ADDRESS = "localhost:9123"
-    return config
+    mock_config = Mock()
+    mock_config.MONGO_DB_URI = "mongodb://localhost:27017/test_db"
+    mock_config.AZURE_OPENAI_API_KEY = "test_api_key"
+    mock_config.AZURE_OPENAI_ENDPOINT = "https://test.openai.azure.com/"
+    mock_config.PROMETHEUS_ADDRESS = "http://localhost:9090"
+    mock_config.MANAGER_API_ADDRESS = "localhost:9123"
+    return mock_config
 
 
 @pytest.fixture

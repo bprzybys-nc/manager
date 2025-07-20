@@ -8,8 +8,8 @@ import pytest
 from unittest.mock import Mock, AsyncMock, patch
 import asyncio
 
-from ...app.orchestrator import DatabaseDecommissionOrchestrator
-from ...app.models import (
+from app.orchestrator import DatabaseDecommissionOrchestrator
+from app.models import (
     WorkflowConfig,
     WorkflowExecutionResult,
     ValidationResult,

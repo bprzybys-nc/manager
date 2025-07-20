@@ -8,14 +8,14 @@ import pytest
 from dataclasses import asdict
 from typing import Dict, Any
 
-from ...app.models import (
+from app.models import (
     WorkflowConfig,
     WorkflowExecutionResult,
     ValidationResult,
     QualityAssuranceResult,
     FileProcessingResult,
-    DatabaseDecommissionRequest,
-    DatabaseDecommissionResponse,
+    WorkflowExecutionRequest,
+    WorkflowExecutionResultResponse,
 )
 
 

@@ -7,7 +7,7 @@ Tests the business validation rules with Manager integration while preserving Gr
 import pytest
 from unittest.mock import Mock, AsyncMock, patch
 
-from ...app.business_rules.validation_rules import (
+from app.business_rules.validation_rules import (
     DatabaseReferenceValidator,
     RuleComplianceValidator,
     ServiceIntegrityValidator,
@@ -15,7 +15,7 @@ from ...app.business_rules.validation_rules import (
     ValidationRuleResult,
     generate_decommissioning_recommendations,
 )
-from ...app.models import ValidationResult
+from app.models import ValidationResult
 
 
 @pytest.mark.unit

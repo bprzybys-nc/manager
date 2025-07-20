@@ -8,17 +8,14 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from pathlib import Path
 
-from ...app.utils import (
+from app.utils import (
     create_logger_for_workflow,
     get_manager_database_client,
-    create_workflow_state_manager,
-    get_azure_openai_client,
-    validate_environment_dependencies,
-    format_duration,
-    safe_json_serialize,
-    mask_sensitive_data,
+    validate_workflow_parameters,
+    create_workflow_config,
+    format_workflow_summary,
 )
-from ...app.models import WorkflowConfig
+from app.models import WorkflowConfig
 
 
 @pytest.mark.unit

@@ -8,11 +8,9 @@ database decommissioning workflow.
 from .file_processor import FileProcessor
 from .pattern_discovery import PatternDiscoveryProcessor
 from .repository_processor import RepositoryProcessor
-from .validation_processor import ValidationProcessor
 
 __all__ = [
     "FileProcessor",
     "PatternDiscoveryProcessor",
-    "RepositoryProcessor", 
-    "ValidationProcessor",
+    "RepositoryProcessor",
 ]

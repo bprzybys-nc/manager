@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="0.917" timestamp="2025-07-20T18:12:20.689391+02:00" hostname="NC-bprzybysz-L0J0W62QRH.local"><testcase classname="" name="unit.test_api_routes" time="0.000"><error message="collection failure">ImportError while importing test module '/Users/bprzybysz/nc-src/ovora/manager/src/usecases/database_decommissioning/tests/unit/test_api_routes.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.12/3.12.10/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_api_routes.py:12: in &lt;module&gt;
+    from app.api.routes import DatabaseDecommissioningRoute
+app/api/__init__.py:19: in &lt;module&gt;
+    from .routes import (
+app/api/routes.py:40: in &lt;module&gt;
+    from ..utils import create_logger_for_workflow, validate_environment_dependencies
+E   ImportError: cannot import name 'validate_environment_dependencies' from 'app.utils' (/Users/bprzybysz/nc-src/ovora/manager/src/usecases/database_decommissioning/app/utils.py)</error></testcase></testsuite></testsuites>
