@@ -79,12 +79,14 @@ cd manager/src/frameworks/graphmcp && make test-all
 cd manager/src/frameworks/graphmcp && make demo
 ```
 
-*** CRITICAL AFTER YOU ARE DONE RESEARCHING AND EXPLORING THE MANAGER CODEBASE BEFORE YOU START WRITING THE PRP ***
+*** CRITICAL AFTER YOU ARE DONE RESEARCHING AND EXPLORING THE MANAGER CODEBASE ***
 
-*** ULTRATHINK ABOUT THE PRP AND PLAN YOUR APPROACH THEN START WRITING THE PRP ***
+*** ULTRATHINK ABOUT THE PRP AND PLAN YOUR APPROACH ***
+
+*** THEN START WRITING THE COMPREHENSIVE PRP ***
 
 ## Output
-Save as: `manager/PRPs/{feature-name}.md`
+Save as: `context-engineering/PRPs/active/{feature-name}.md`
 
 ## Quality Checklist
 - [ ] All necessary manager context included
@@ -96,6 +98,17 @@ Save as: `manager/PRPs/{feature-name}.md`
 - [ ] GraphMCP framework integration considered (if applicable)
 - [ ] Microservices architecture implications addressed
 
-Score the PRP on a scale of 1-10 (confidence level to succeed in one-pass implementation using Claude Code)
+## PRP Success Criteria
 
-Remember: The goal is one-pass implementation success through comprehensive manager-specific context.
+Score the PRP on a scale of 1-10 for confidence level to succeed in one-pass implementation:
+
+**Scoring Criteria:**
+- 10: Complete context, executable validation gates, comprehensive research
+- 8-9: Thorough context with minor gaps
+- 6-7: Good context but missing key details
+- 4-5: Basic context but significant gaps
+- 1-3: Insufficient context for successful implementation
+
+**Target Score: 8-10** for manager component features
+
+Remember: The goal is one-pass implementation success through comprehensive context engineering.

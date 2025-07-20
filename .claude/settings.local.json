@@ -151,7 +151,10 @@
       "Bash(popd:*)",
       "Bash(dirs:*)",
       "WebFetch(domain:github.com)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__jetbrains__list_directory_tree_in_folder",
+      "mcp__jetbrains__get_file_text_by_path"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

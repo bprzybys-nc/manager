@@ -1,0 +1,43 @@
+[project]
+name = "database_decommissioning"
+version = "0.1.0"
+description = "Database decommissioning workflow use case"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.6",
+    "uvicorn>=0.34.0",
+    "pydantic>=2.0.0",
+    "aiohttp>=3.11.12",
+    "requests>=2.32.3",
+    # Manager integration dependencies
+    "pymongo>=4.11.0",
+    "celery[redis]>=5.4.0",
+    # AI and workflow dependencies
+    "langchain>=0.3.17",
+    "langchain-openai>=0.3.0",
+    "openai>=1.59.5",
+    # Slack integration
+    "slack-bolt>=1.22.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.10.0",
+    "python-dotenv>=0.21.0",
+]
+
+[dependency-groups]
+dev = [
+    "database-decommissioning",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=1.1.0",
+    "python-dotenv>=0.21.0",
+]
+
+[tool.uv.sources]
+database-decommissioning = { workspace = true }

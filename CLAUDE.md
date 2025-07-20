@@ -9,11 +9,10 @@ This project uses **Context Engineering** - a systematic approach to providing A
 ### Context Engineering Workflow
 
 1. **Feature Request**: Start with detailed `INITIAL.md` template
-2. **Research**: Use `/research <feature_area>` to understand existing patterns
-3. **Examples**: Use `/examples <pattern_type>` to find relevant patterns
-4. **PRP Creation**: Use `/prp <feature_name>` to create comprehensive Product Requirements Prompt
-5. **Implementation**: Use `/implement PRPs/active/<feature_name>.md` for structured implementation
-6. **Validation**: Use `/validate <feature_name>` for thorough validation
+2. **Research**: Manually research existing patterns and architecture
+3. **PRP Creation**: Use `/generate-prp INITIAL.md` to create comprehensive Product Requirements Prompt
+4. **Implementation**: Use `/execute-prp PRPs/active/<feature_name>.md` for structured implementation
+5. **Validation**: Follow validation gates defined in the PRP
 
 ### Manager-Specific Context Assembly
 
@@ -29,14 +28,10 @@ The Manager component uses specialized context assembly patterns:
 
 ### Context Engineering Commands
 
-- `/research <topic>` - Analyze codebase patterns and architecture
-- `/examples <pattern_type>` - Extract relevant code patterns
-- `/prp <feature_name>` - Create comprehensive implementation blueprint
-- `/implement <prp_file>` - Execute implementation with full context
-- `/validate <feature_name>` - Validate implementation against requirements
-- `/context <feature_request>` - Assemble comprehensive context
+- `/generate-prp <initial_file>` - Create comprehensive Product Requirements Prompt
+- `/execute-prp <prp_file>` - Execute implementation with full context
 
-See `context-engineering/commands/` for detailed command documentation.
+See `.claude/commands/` for detailed command documentation.
 
 ## Project Overview
 
@@ -853,18 +848,13 @@ context-engineering/
 
 **Use custom commands for structured development:**
 
-**Research Commands:**
-- `/research <topic>` - Comprehensive codebase analysis
-- `/examples <pattern_type>` - Pattern extraction and documentation
+**Available Commands:**
+- `/generate-prp <initial_file>` - Create comprehensive Product Requirements Prompt
+- `/execute-prp <prp_file>` - Execute structured implementation with full context
 
-**Implementation Commands:**
-- `/prp <feature_name>` - Create Product Requirements Prompt
-- `/implement <prp_file>` - Execute structured implementation
-- `/context <feature_request>` - Assemble comprehensive context
-
-**Validation Commands:**
-- `/validate <feature_name>` - Comprehensive validation
-- Standard make commands for specific validation types
+**Validation:**
+- Follow validation gates defined in generated PRPs
+- Use standard make commands: `make test-all`, `make lint`, `make format`
 
 ### 7. Documentation-Driven Development
 
