@@ -1,465 +1,318 @@
-# Ovora Manager: AI-Powered System Administration Platform
+# Database Decommissioning Workflow Migration: Framework to Usecases
 
-## Project Overview and Context
+## Feature Request
 
-Ovora Manager (SysAIdmin) is a comprehensive AI-powered system administration platform designed to automate incident response, system monitoring, and operational tasks. The Manager component serves as the backend orchestration layer, leveraging Azure OpenAI, advanced workflow orchestration, and microservices architecture to provide intelligent system administration capabilities.
+### Basic Information
+- **Feature Name**: Database Decommissioning Workflow Migration
+- **Requested By**: Manager Development Team
+- **Date**: 2025-01-20
+- **Priority**: High
+- **Estimated Complexity**: Medium
 
-This document provides comprehensive context for developing new features within the Manager component and its integration with the broader Ovora ecosystem.
+### Feature Description
 
-## Core Architecture
+#### What
+Migrate the comprehensive database decommissioning workflow from `src/frameworks/graphmcp/concrete/db_decommission/` to `src/usecases/database_decommissioning/` to better align with the Manager component's architectural patterns and improve discoverability for business use cases.
 
-### System Components
+The migration involves moving the entire workflow implementation while:
+- Preserving all existing functionality and tests
+- Maintaining compatibility with GraphMCP framework
+- Improving integration with Manager's microservices architecture
+- Enhancing visibility as a core Manager use case
 
-1. **Manager (This Component) - Python/FastAPI**
-   - Backend API with AI capabilities
-   - Task queue processing with Celery
-   - Slack integration for notifications
-   - Microservices architecture with tool isolation
-   - AI-powered incident response and automation
-   - GraphMCP framework for workflow orchestration
+#### Why
+The database decommissioning workflow is a mature, production-ready business capability that:
+- **Business Value**: Provides critical automation for database lifecycle management
+- **Architectural Alignment**: Should be positioned as a core Manager use case rather than framework component
+- **Discoverability**: Makes the capability more visible to Manager users and developers
+- **Integration**: Better integration with Manager's API, authentication, and monitoring systems
+- **Maintainability**: Aligns with Manager's use case organizational patterns
 
-2. **Agent (Go) - External Component**
-   - Lightweight monitoring agent
-   - Deployed on target machines
-   - Periodic data collection and reporting
-   - Secure communication with Manager
+Current placement in the GraphMCP framework's `concrete/` directory obscures its value as a business capability and limits its integration with Manager's broader ecosystem.
 
-3. **UI (Streamlit) - External Component**
-   - Web dashboard for visualization
-   - Auth0 authentication
-   - Real-time metrics and incident management
-   - Interactive workflow monitoring
+#### When
+- **Phase 1**: Complete migration with preserved functionality (Week 1)
+- **Phase 2**: Enhanced Manager integration (Week 2-3)
+- **Dependencies**: No blocking dependencies, but requires coordination with GraphMCP framework changes
 
-### Manager Component Architecture
+#### Who
+- **Primary Users**: DevOps engineers, Database administrators, System administrators
+- **Secondary Users**: Platform engineers managing database lifecycle
+- **Stakeholders**: Manager API consumers, Workflow automation teams
 
-The Manager component features a sophisticated microservices architecture:
+### Functional Requirements
 
+#### Core Functionality
+- **Complete Workflow Migration**: Move all database decommissioning workflow components
+- **Preserved Functionality**: Maintain all existing features without regression
+- **Enhanced Integration**: Integrate with Manager's API routing and authentication
+- **Improved Discoverability**: Make workflow accessible through Manager's use case directory
+- **Documentation Migration**: Update all documentation and examples
+
+#### User Stories
+- As a DevOps engineer, I want to find database decommissioning in the usecases directory so that I can easily discover this capability
+- As a Manager developer, I want database workflows in usecases so that they align with other business capabilities
+- As a system administrator, I want the same powerful database decommissioning features after migration
+- As a platform engineer, I want better integration with Manager's monitoring and logging systems
+
+#### Success Criteria
+- All existing functionality preserved with 100% test coverage maintained
+- Database decommissioning workflow accessible through Manager's use case structure
+- Enhanced integration with Manager's logging, monitoring, and API systems
+- Documentation updated to reflect new location and Manager integration
+- No performance degradation in workflow execution
+
+### Technical Requirements
+
+#### Architecture Integration
+- **Manager Component**: Position as core use case within Manager's business capability structure
+- **GraphMCP Framework**: Maintain compatibility with GraphMCP workflow orchestration
+- **API Integration**: Integrate with Manager's FastAPI routing and authentication
+- **Monitoring Integration**: Leverage Manager's Prometheus metrics and logging systems
+
+#### Current Structure to Migrate
 ```
-manager/
-├── src/
-│   ├── frameworks/
-│   │   └── graphmcp/              # Advanced workflow orchestration
-│   ├── tools/                     # Microservice integrations
-│   │   ├── confluence/           # Atlassian Confluence
-│   │   ├── jira/                 # Atlassian Jira
-│   │   ├── cmd_exec/             # Command execution
-│   │   └── db_servers_cmdb/      # Database server CMDB
-│   ├── modules/                   # Core business logic
-│   ├── usecases/                  # Use case implementations
-│   └── api.py                     # Main API routes
-├── main.py                        # API service entry point
-├── worker_main.py                 # Celery worker entry point
-└── slack_main.py                  # Slack integration worker
-```
-
-### Key Technologies
-
-- **AI/ML**: Azure OpenAI, LangChain, LangGraph, Langfuse
-- **Backend**: FastAPI, Celery, Redis, MongoDB
-- **Frontend**: Streamlit, Auth0 (UI component)
-- **Monitoring**: Prometheus, custom metrics collection
-- **Orchestration**: GraphMCP framework for workflow automation
-- **Infrastructure**: Docker, Kubernetes, Helm charts
-
-## Technical Requirements
-
-### System Requirements
-- **Python**: 3.12+ for Manager component
-- **Go**: 1.21+ for Agent component (external)
-- **Node.js**: 18+ for MCP server dependencies
-- **Docker**: For containerized deployment
-- **Kubernetes**: For production orchestration
-
-### Performance Requirements
-- **API Response Time**: < 500ms for standard operations
-- **Database Operations**: < 100ms for simple queries
-- **AI Operations**: < 30s for complex AI processing
-- **Workflow Steps**: < 2 minutes per step (configurable)
-- **Memory Usage**: < 512MB per service instance
-- **CPU Usage**: < 80% sustained CPU usage
-
-### Security Requirements
-- **Authentication**: Auth0 for UI, API tokens for services
-- **Data Encryption**: TLS 1.3 for data in transit
-- **Secret Management**: Environment-based secret handling
-- **Access Control**: Role-based access control
-- **Input Validation**: Comprehensive validation and sanitization
-
-## GraphMCP Framework
-
-The GraphMCP framework is the core orchestration system within the Manager component that enables:
-
-### Core Capabilities
-- **Multi-Client Coordination**: GitHub, Slack, Repomix, filesystem operations
-- **AI-Driven Automation**: Intelligent workflow steps with context awareness
-- **Robust Error Handling**: Graceful degradation and comprehensive logging
-- **Scalable Architecture**: Async-first design with connection pooling
-- **Production-Ready**: Comprehensive testing, monitoring, and deployment
-
-### Framework Architecture
-```
-GraphMCP Framework
-├── clients/                    # MCP client implementations
-│   ├── base.py                # Abstract base client with connection management
-│   ├── github.py              # GitHub repository operations
-│   ├── slack.py               # Slack notifications
-│   ├── repomix.py             # Repository packaging and analysis
-│   └── filesystem.py          # File system operations
-├── workflows/                  # Workflow orchestration engine
-│   ├── builder.py             # Fluent API for workflow construction
-│   ├── context.py             # Shared state management
-│   └── ruliade/               # Rule-based workflow patterns
-├── concrete/                   # Concrete workflow implementations
-│   ├── db_decommission/       # Database decommissioning workflow
-│   └── preview_ui/            # Streamlit visualization
-├── utils/                      # Reusable utilities
-│   ├── parameter_service.py   # Configuration management
-│   ├── monitoring.py          # System monitoring
-│   └── error_handling.py      # Error handling system
-└── graphmcp_logging/           # Structured logging system
+src/frameworks/graphmcp/concrete/db_decommission/
+├── __init__.py                    # Main workflow module
+├── cli.py                         # Command-line interface
+├── client_helpers.py              # MCP client utilities
+├── data_models.py                 # Workflow data models
+├── entity_reference_extractor.py  # Database reference analysis
+├── environment_validation.py      # Environment setup validation
+├── file_processor.py              # File processing engine
+├── github_helpers.py              # GitHub integration helpers
+├── pattern_discovery.py           # AI-powered pattern discovery
+├── repository_processors.py       # Repository processing logic
+├── source_type_classifier.py      # Source code classification
+├── utils.py                       # Workflow utilities
+├── validation_checks.py           # Quality assurance checks
+├── validation_helpers.py          # Validation utility functions
+├── workflow_steps.py              # Workflow step implementations
+├── rules/                         # Business rules and patterns
+│   ├── decomission-refac-ruliade.md
+│   └── quicksearchpatterns.md
+└── tests/                         # Comprehensive test suite
+    ├── conftest.py
+    ├── pytest.ini
+    ├── unit/
+    ├── integration/
+    └── tests/
 ```
 
-### Key Patterns
-
-1. **Workflow Builder**: Fluent API for constructing complex workflows
-2. **MCP Client Integration**: Seamless integration with Model Context Protocol servers
-3. **Strategy-Based Processing**: Intelligent file and data processing strategies
-4. **Contextual State Management**: Shared context across workflow steps
-5. **Structured Logging**: Comprehensive logging with performance metrics
-
-### Context Engineering Integration
-
-The GraphMCP framework implements advanced context engineering principles:
-
-- **Comprehensive Context Assembly**: Complete context for AI-assisted development
-- **Pattern-Based Implementation**: Consistent patterns across all implementations
-- **Product Requirements Prompts (PRPs)**: Structured feature development process
-- **Validation Gates**: Comprehensive quality assurance framework
-- **Documentation-Driven Development**: Extensive examples and patterns
-
-## Manager Component Integration Points
-
-### Internal Architecture
-
-#### Database Layer
-- **Primary**: MongoDB via `DatabaseClient` wrapper
-- **Collections**: incidents, inventory, tasks, questions, checkpoints
-- **Connection**: Context manager pattern with proper cleanup
-
-#### AI Integration
-- **Backend**: Azure OpenAI with LangChain/LangGraph
-- **Monitoring**: Langfuse for observability
-- **Tools**: Structured tool definitions for agent actions
-
-#### Microservices Tools
-- Each tool is a separate FastAPI service with own `pyproject.toml`
-- Examples: `src/tools/confluence/`, `src/tools/db_servers_cmdb/`
-- Pattern: Dockerized services with standardized API
-
-#### Task Processing
-- **Queue**: Celery with Redis broker
-- **Key tasks**: `run_incident_assistant`, `scheduler.analyze_free_space`
-- **Monitoring**: Prometheus metrics for task performance
-
-### External Integration Points
-
-#### With Agent Component
-- **Communication**: RESTful API over HTTP/HTTPS
-- **Data Flow**: Agent → Manager API → MongoDB
-- **Authentication**: API tokens and secure endpoints
-- **Monitoring**: Prometheus metrics collection
-
-#### With UI Component
-- **Communication**: RESTful API over HTTP/HTTPS
-- **Data Flow**: UI → Manager API → Business Logic
-- **Authentication**: Auth0 integration for user sessions
-- **Real-time Updates**: WebSocket or polling for live data
-
-#### External Services
-- **Atlassian**: Confluence and Jira integration via dedicated tools
-- **GitHub**: Repository operations and PR management via GraphMCP
-- **Slack**: Real-time notifications and interactions via GraphMCP and worker
-- **Azure**: OpenAI services and cloud resources
-- **Prometheus**: Metrics collection and monitoring
-
-## Development Workflow
-
-### Package Management
-- **Python**: Use `uv` for dependency management
-- **Go**: Standard `go mod` with version pinning (Agent component)
-- **Isolation**: Component-specific dependencies with isolated environments
-
-### Testing Strategy
-- **Unit Tests**: Fast, isolated, comprehensive coverage (80% minimum)
-- **Integration Tests**: Component interaction testing
-- **E2E Tests**: Full workflow validation including external integrations
-- **Performance Tests**: Resource usage and timing validation
-
-### Code Organization
-- **Modular Structure**: Clear domain separation within Manager
-- **Microservices**: Each tool is a separate FastAPI service
-- **Standardized APIs**: Consistent patterns across components
-- **Documentation**: Comprehensive inline and external documentation
-
-### Context Engineering Workflow
-
-When developing new features for the Manager component:
-
-1. **Feature Request**: Start with detailed `INITIAL.md` template
-2. **Research**: Use `/research <feature_area>` to understand existing patterns
-3. **Examples**: Use `/examples <pattern_type>` to find relevant patterns
-4. **PRP Creation**: Use `/prp <feature_name>` to create comprehensive Product Requirements Prompt
-5. **Implementation**: Use `/implement PRPs/active/<feature_name>.md` for structured implementation
-6. **Validation**: Use `/validate <feature_name>` for thorough validation
-
-## Configuration and Environment
-
-### Required Environment Variables
-- `AZURE_OPENAI_API_KEY`: Azure OpenAI API key
-- `AZURE_OPENAI_ENDPOINT`: Azure OpenAI endpoint
-- `MONGO_DB_URI`: MongoDB connection string
-- `PROMETHEUS_ADDRESS`: Prometheus server address
-- `MANAGER_API_ADDRESS`: Manager API address for Prometheus targets
-
-### Optional Environment Variables
-- `SLACK_BOT_TOKEN`: Slack bot token
-- `SLACK_APP_TOKEN`: Slack app token
-- `CELERY_BROKER_URL`: Redis URL (defaults to localhost)
-- `CONFLUENCE_URL`: Confluence instance URL
-- `JIRA_URL`: Jira instance URL
-- `METRICS_DIR`: Directory for metrics storage
-
-### GraphMCP Configuration
-- **MCP Servers**: Configured in `src/frameworks/graphmcp/mcp_config.json`
-- **Environment Integration**: Supports variable substitution
-- **Development vs Production**: Different configurations for different environments
-
-## Feature Development Process
-
-### Context Engineering Process
-
-This project follows context engineering principles for AI-assisted development:
-
-#### 1. Comprehensive Context Assembly
-**Always provide complete context:**
-- Reference existing patterns from `src/frameworks/graphmcp/examples/` directory
-- Include architectural context and constraints
-- Specify exact patterns to follow
-- Provide detailed implementation requirements
-
-#### 2. Structured Feature Requests
-**Use this INITIAL.md template structure for all feature requests:**
-- Provide comprehensive feature descriptions
-- Include business justification and success criteria
-- Specify technical requirements and constraints
-- Reference existing patterns and similar features
-- Define clear acceptance criteria
-
-#### 3. Product Requirements Prompts (PRPs)
-**Create PRPs for all non-trivial features:**
-- Research existing codebase patterns thoroughly
-- Assemble comprehensive implementation context
-- Provide detailed step-by-step implementation plan
-- Include validation criteria and testing requirements
-- Reference specific code examples and patterns
-
-#### 4. Implementation Guidelines
-**Follow established patterns consistently:**
-- **MCP Clients**: Use BaseMCPClient pattern with SERVER_NAME
-- **Workflows**: Use WorkflowBuilder with step_auto() method
-- **Logging**: Use structured logging with get_logger()
-- **Testing**: Use pytest with appropriate markers
-- **Error Handling**: Use custom exception hierarchies
-
-#### 5. Validation Gates
-**Implement comprehensive validation:**
-- Code quality validation (lint, format, type-check)
-- Functional validation (unit, integration, E2E tests)
-- Performance validation (response time, throughput)
-- Architecture validation (pattern compliance)
-- Documentation validation (completeness, accuracy)
-
-### Feature Development Steps
-
-When developing new features for the Manager component:
-
-1. **Context Analysis**: Understand existing patterns and architecture
-2. **Requirements Gathering**: Use this INITIAL.md structure for detailed requirements
-3. **Design Review**: Ensure alignment with existing architecture
-4. **Implementation**: Follow established patterns and conventions
-5. **Testing**: Comprehensive testing at all levels
-6. **Validation**: Use validation framework for quality assurance
-7. **Documentation**: Update relevant documentation and examples
-8. **Integration**: Ensure proper integration with Agent and UI components
-9. **Deployment**: Follow established deployment procedures
-
-## Use Cases and Examples
-
-### Database Decommissioning (GraphMCP)
-- Automated database reference discovery
-- Intelligent code refactoring
-- GitHub PR creation and management
-- Comprehensive validation and testing
-
-### Incident Response (Manager Core)
-- AI-powered incident analysis
-- Automated remediation workflows
-- Slack notifications and updates
-- Metrics collection and reporting
-
-### System Monitoring (Cross-Component)
-- Real-time agent data collection (Agent → Manager)
-- Threshold-based alerting (Manager logic)
-- Performance metrics analysis (Manager processing)
-- Dashboard visualization (Manager → UI)
-
-### Atlassian Integration (Manager Tools)
-- Confluence content management and search
-- Jira ticket lifecycle management
-- Automated documentation updates
-- Issue tracking and resolution
-
-## Quality Requirements
-
-### Code Quality
-- **Type Safety**: Use type hints and validation throughout
-- **Error Handling**: Comprehensive error management with context
-- **Performance**: Async-first design with intelligent caching
-- **Testing**: High test coverage with multiple test types
-- **Documentation**: Clear, comprehensive documentation with examples
-
-### Architecture Patterns
-- **Microservices**: Service isolation and independence
-- **Event-Driven**: Async message passing and event handling
-- **Context-Aware**: Shared state and context management
-- **Observability**: Comprehensive logging and monitoring
-- **Scalability**: Horizontal scaling and load distribution
-
-### Security Considerations
-- **Authentication**: Proper authentication for all endpoints
-- **Authorization**: Role-based access control
-- **Secrets Management**: Environment-based secret handling
-- **Network Security**: Service isolation and secure communication
-- **Data Protection**: Encryption at rest and in transit
-- **Input Validation**: Comprehensive validation and sanitization
-
-## Deployment Architecture
-
-### Development
-- Docker Compose for local development
-- Local MongoDB, Redis, and Prometheus instances
-- Hot-reload for rapid development cycles
-- Component isolation for independent development
-
-### Production
-- Kubernetes deployment with Helm charts
-- Containerized services with health checks
-- Horizontal scaling and load balancing
-- Comprehensive monitoring and alerting
-- Service mesh for secure inter-component communication
-
-### Container Architecture
-```bash
-# Manager container
-docker build -t sysaidmin-manager -f Containerfile .
-docker run \
-  -e AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY} \
-  -e AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT} \
-  -e MONGO_DB_URI=${MONGO_DB_URI} \
-  -e SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN} \
-  sysaidmin-manager:latest
+#### Target Structure
+```
+src/usecases/database_decommissioning/
+├── __init__.py                    # Use case module
+├── api.py                         # FastAPI routes for use case
+├── pyproject.toml                 # Use case dependencies
+├── README.md                      # Use case documentation
+├── app/                           # Application logic
+│   ├── __init__.py
+│   ├── workflow_orchestrator.py   # Main workflow orchestration
+│   ├── models.py                  # Data models
+│   ├── clients/                   # MCP and external clients
+│   ├── processors/                # Processing engines
+│   ├── validation/                # Validation logic
+│   └── utils.py                   # Utilities
+├── rules/                         # Business rules
+└── tests/                         # Test suite
+    ├── unit/
+    ├── integration/
+    └── e2e/
 ```
 
-## Success Criteria
+#### Performance Requirements
+- **Migration Performance**: No performance degradation from current implementation
+- **API Response Time**: < 500ms for workflow initiation endpoints
+- **Workflow Execution**: Maintain current execution times (< 2 minutes per step)
+- **Resource Usage**: Compatible with Manager's resource constraints
 
-Features developed for the Manager component should demonstrate:
+#### Security Requirements
+- **Authentication**: Integrate with Manager's authentication system
+- **Authorization**: Role-based access control for database operations
+- **Secret Management**: Use Manager's environment-based secret handling
+- **Audit Logging**: Enhanced audit trails through Manager's logging system
 
-### Functional Criteria
-- **Complete Implementation**: Full implementation of requirements
-- **Cross-Component Integration**: Seamless integration with Agent and UI
-- **External Service Integration**: Proper integration with external services
-- **Business Value**: Clear business value and user benefit
+### Interface Requirements
 
-### Technical Criteria
-- **Performance**: Meets performance requirements (< 500ms API response)
-- **Reliability**: Robust error handling and recovery mechanisms
-- **Scalability**: Ability to handle expected load and growth
-- **Maintainability**: Clear code structure and comprehensive documentation
+#### API Design
+```python
+# New Manager API endpoints
+POST /api/v1/usecases/database-decommissioning/workflows
+GET  /api/v1/usecases/database-decommissioning/workflows/{workflow_id}
+POST /api/v1/usecases/database-decommissioning/workflows/{workflow_id}/execute
+GET  /api/v1/usecases/database-decommissioning/workflows/{workflow_id}/status
+```
 
-### Quality Criteria
-- **Security**: Appropriate security considerations and implementations
-- **Testing**: Comprehensive test coverage (80% minimum)
-- **Documentation**: Complete documentation with usage examples
-- **Monitoring**: Proper logging, metrics, and alerting
+#### GraphMCP Integration
+- **Workflow Builder**: Continue using GraphMCP's WorkflowBuilder pattern
+- **MCP Clients**: Maintain all existing MCP client integrations
+- **Context Management**: Preserve workflow context and state management
 
-### Architecture Criteria
-- **Pattern Compliance**: Follows established architectural patterns
-- **Context Engineering**: Implements context engineering principles
-- **Framework Integration**: Proper integration with GraphMCP framework
-- **Service Independence**: Maintains microservice independence
+#### Manager Integration Points
+- **Health Checks**: Standard Manager health endpoint patterns
+- **Metrics**: Prometheus metrics collection
+- **Logging**: Structured logging through Manager's logging system
+- **Configuration**: Manager's environment variable patterns
 
-## Component Compatibility Requirements
+### Data Requirements
 
-When developing Manager features, ensure compatibility with:
+#### Data Models Migration
+- **Preserve Models**: All existing data models maintained
+- **Enhanced Models**: Additional models for Manager API integration
+- **Validation**: Comprehensive Pydantic validation throughout
 
-### Agent Component
-- **API Contracts**: Maintain stable API contracts for Agent communication
-- **Data Formats**: Consistent data formats for metrics and monitoring
-- **Authentication**: Compatible authentication mechanisms
-- **Deployment**: Independent deployment capabilities
+#### Data Storage
+- **Configuration**: Manager's environment-based configuration
+- **Workflow State**: Continue using GraphMCP's context management
+- **Results Storage**: Integration with Manager's MongoDB if needed
 
-### UI Component
-- **API Endpoints**: Provide necessary API endpoints for UI functionality
-- **Real-time Data**: Support real-time data updates for dashboard
-- **Authentication**: Compatible with Auth0 authentication
-- **Data Models**: Consistent data models for UI consumption
+#### Data Processing
+- **Processing Logic**: All existing processing capabilities preserved
+- **Enhanced Monitoring**: Better observability through Manager's systems
 
-### External Dependencies
-- **Version Compatibility**: Maintain compatibility with external service versions
-- **Configuration**: Flexible configuration for different environments
-- **Error Handling**: Graceful handling of external service failures
-- **Monitoring**: Comprehensive monitoring of external integrations
+### Quality Requirements
 
-This comprehensive context provides the foundation for accurate, efficient, and consistent feature development within the Manager component of the Ovora ecosystem, ensuring proper integration with all system components while maintaining the high standards of the context engineering methodology.
+#### Testing
+- **Unit Tests**: Maintain 80%+ test coverage
+- **Integration Tests**: All GraphMCP integration tests preserved
+- **E2E Tests**: End-to-end testing in Manager context
+- **Performance Tests**: Verify no performance regression
+
+#### Documentation
+- **API Documentation**: OpenAPI spec for new Manager endpoints
+- **Use Case Documentation**: Comprehensive README in new location
+- **Migration Guide**: Documentation for migration process
+- **Integration Examples**: Examples of using through Manager API
+
+#### Monitoring
+- **Workflow Metrics**: Database decommissioning-specific metrics
+- **Manager Metrics**: Integration with Manager's monitoring
+- **Error Tracking**: Enhanced error reporting and tracking
+
+### Constraints and Assumptions
+
+#### Technical Constraints
+- **GraphMCP Compatibility**: Must maintain compatibility with GraphMCP framework
+- **Backward Compatibility**: Existing workflow configurations must continue working
+- **Manager Integration**: Must follow Manager's architectural patterns
+
+#### Business Constraints
+- **Zero Downtime**: Migration must not impact existing deployments
+- **Feature Parity**: All existing features must be preserved
+- **User Experience**: No changes to end-user workflow experience
+
+#### Assumptions
+- **GraphMCP Framework**: Will continue to be used for workflow orchestration
+- **Manager Architecture**: Current Manager use case patterns are stable
+- **Resource Availability**: Development resources available for migration
+
+### Implementation Context
+
+#### Similar Features
+- **Existing Use Cases**: `src/usecases/db_incident_assistant/` provides pattern for use case structure
+- **Manager API Patterns**: FastAPI patterns from `src/api.py`
+- **GraphMCP Integration**: Current GraphMCP framework integration patterns
+
+#### Existing Patterns
+- **Use Case Structure**: Follow Manager's use case organizational patterns
+- **MCP Client Patterns**: Use established MCP client patterns from GraphMCP framework
+- **Manager Integration**: Follow Manager's microservice integration patterns
+
+#### Code Examples
+- **Use Case Pattern**: Reference `src/usecases/db_incident_assistant/` for structure
+- **GraphMCP Workflow**: Reference existing workflow implementations
+- **Manager API**: Reference existing Manager API endpoint patterns
+
+### Acceptance Criteria
+
+#### Functional Criteria
+- [ ] Complete migration of all database decommissioning components
+- [ ] All existing functionality preserved and tested
+- [ ] New Manager API endpoints implemented and documented
+- [ ] Integration with Manager's authentication and authorization
+- [ ] Enhanced monitoring and logging through Manager systems
+
+#### Technical Criteria
+- [ ] 100% test coverage maintained during migration
+- [ ] No performance degradation in workflow execution
+- [ ] GraphMCP framework compatibility preserved
+- [ ] Manager architectural patterns followed
+- [ ] API documentation complete and accurate
+
+#### Quality Criteria
+- [ ] Comprehensive documentation updated
+- [ ] Migration process documented
+- [ ] Integration examples provided
+- [ ] Security requirements implemented
+- [ ] Monitoring and alerting configured
+
+### Risk Assessment
+
+#### Technical Risks
+- **Import Dependencies**: Risk of breaking import paths during migration
+- **Configuration Changes**: Risk of configuration incompatibilities
+- **Integration Complexity**: Risk of complex Manager integration issues
+
+#### Business Risks
+- **Workflow Disruption**: Risk of disrupting existing database decommissioning workflows
+- **User Confusion**: Risk of user confusion about new location
+- **Feature Gaps**: Risk of missing functionality during migration
+
+#### Mitigation Strategies
+- **Phased Migration**: Implement migration in phases with thorough testing
+- **Backward Compatibility**: Maintain backward compatibility during transition
+- **Comprehensive Testing**: Extensive testing at each migration phase
+- **Documentation**: Clear documentation of changes and migration process
+
+### Additional Context
+
+#### Research Findings
+- Database decommissioning workflow is mature and stable
+- Current GraphMCP integration is well-established
+- Manager use case patterns are well-defined
+- Migration aligns with architectural evolution
+
+#### Stakeholder Input
+- DevOps teams want better discoverability of database automation capabilities
+- Platform engineers need better integration with Manager's ecosystem
+- Development team supports architectural alignment
+
+#### Alternative Approaches
+1. **Keep in GraphMCP**: Maintain current location but enhance Manager integration
+2. **Dual Location**: Maintain both locations during transition period
+3. **Full Migration**: Complete migration to use cases (recommended)
 
 ---
 
-## Feature Request Template
+## Implementation Plan
 
-Use this structure when requesting new features for the Manager component:
+### Phase 1: Core Migration (Week 1)
+1. **Directory Structure**: Create new use case directory structure
+2. **Code Migration**: Move all source files with preserved functionality
+3. **Test Migration**: Move and update all tests
+4. **Documentation**: Update import paths and documentation
 
-### Basic Information
-- **Feature Name**: [Clear, descriptive name]
-- **Component**: [Manager/GraphMCP/Tools/Core]
-- **Requested By**: [Your name/team]
-- **Date**: [YYYY-MM-DD]
-- **Priority**: [High/Medium/Low]
-- **Estimated Complexity**: [Simple/Medium/Complex]
+### Phase 2: Manager Integration (Week 2-3)
+1. **API Integration**: Implement Manager API endpoints
+2. **Authentication**: Integrate with Manager authentication
+3. **Monitoring**: Enhance monitoring and logging
+4. **Documentation**: Complete API documentation
 
-### Feature Description
-- **What**: [Comprehensive description of what the feature should do]
-- **Why**: [Business justification and value proposition]
-- **When**: [Timeline requirements and dependencies]
-- **Who**: [Target users and stakeholders]
+### Phase 3: Validation & Cleanup (Week 3-4)
+1. **Testing**: Comprehensive testing of migrated functionality
+2. **Performance**: Validate performance characteristics
+3. **Documentation**: Final documentation updates
+4. **Cleanup**: Remove old GraphMCP location
 
-### Technical Requirements
-- **Architecture Integration**: [How this integrates with Manager architecture]
-- **Framework Integration**: [GraphMCP framework integration requirements]
-- **Cross-Component Impact**: [Impact on Agent and UI components]
-- **Performance Requirements**: [Response time, throughput, resource usage]
-- **Security Requirements**: [Authentication, authorization, data protection]
+## Next Steps
 
-### Implementation Context
-- **Similar Features**: [Reference similar features in the codebase]
-- **Existing Patterns**: [Reference existing patterns from examples/]
-- **Integration Points**: [External services and internal components]
+After completing this template:
 
-### Acceptance Criteria
-- [ ] Functional requirements met
-- [ ] Technical requirements satisfied
-- [ ] Integration tests passing
-- [ ] Performance criteria achieved
-- [ ] Security requirements implemented
-- [ ] Documentation completed
+1. **Research Phase**: Use `/research database_decommissioning` to understand current implementation
+2. **Example Analysis**: Use `/examples migration_patterns` to find similar migrations
+3. **PRP Creation**: Use `/prp database_decommissioning_migration` to create comprehensive implementation plan
+4. **Implementation**: Use `/implement PRPs/active/database_decommissioning_migration.md` to execute migration
+5. **Validation**: Use `/validate database_decommissioning_migration` to validate implementation
 
-Following this template and the context engineering process ensures successful feature development within the Manager component.
+This migration will significantly improve the discoverability and integration of the database decommissioning capability while preserving all existing functionality and maintaining compatibility with the GraphMCP framework.
