@@ -160,7 +160,8 @@
       "Bash(git config:*)",
       "Bash(.venv/bin/pytest --version)",
       "Bash(uv pip install:*)",
-      "Bash(PYTHONPATH=. .venv/bin/python -m pytest tests/unit/ --verbose -m \"not e2e\" --tb=short)"
+      "Bash(PYTHONPATH=. .venv/bin/python -m pytest tests/unit/ --verbose -m \"not e2e\" --tb=short)",
+      "Bash(repomix)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",
