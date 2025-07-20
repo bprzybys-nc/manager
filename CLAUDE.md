@@ -15,6 +15,18 @@ This project uses **Context Engineering** - a systematic approach to providing A
 5. **Implementation**: Use `/implement PRPs/active/<feature_name>.md` for structured implementation
 6. **Validation**: Use `/validate <feature_name>` for thorough validation
 
+### Manager-Specific Context Assembly
+
+The Manager component uses specialized context assembly patterns:
+
+- **Comprehensive Component Context**: Full understanding of Manager architecture, GraphMCP framework, and microservices patterns
+- **Cross-Component Integration**: Detailed knowledge of Agent (Go) and UI (Streamlit) integration requirements
+- **AI-Powered Workflows**: Context for Azure OpenAI, LangChain, and GraphMCP workflow development
+- **Database Patterns**: MongoDB interaction patterns and collection management
+- **Tool Development**: Microservice tool patterns for external integrations
+- **Performance Requirements**: Response time, resource usage, and scalability considerations
+- **Security Context**: Authentication, authorization, and data protection patterns
+
 ### Context Engineering Commands
 
 - `/research <topic>` - Analyze codebase patterns and architecture
@@ -58,6 +70,28 @@ The Manager is the core orchestration component featuring:
 - Manager → Prometheus (metrics) → UI (visualization)
 - Manager → Slack (notifications) → Users
 - Manager → Azure OpenAI (AI processing) → Tools execution
+
+### Cross-Component Integration
+
+The Manager component maintains compatibility and integration with:
+
+#### Agent Component (Go)
+- **API Contracts**: RESTful endpoints for data collection and monitoring
+- **Data Formats**: Structured JSON for metrics, system information, and health status
+- **Authentication**: Secure API token-based authentication
+- **Deployment**: Independent deployment with configurable Manager endpoints
+
+#### UI Component (Streamlit)
+- **API Endpoints**: Complete REST API for dashboard functionality
+- **Real-time Data**: WebSocket or polling-based live updates
+- **Authentication**: Auth0 integration with session management
+- **Data Models**: Consistent Pydantic models for UI consumption
+
+#### External Services
+- **Atlassian Integration**: Confluence and Jira via dedicated microservice tools
+- **GitHub Operations**: Repository management through GraphMCP framework
+- **Slack Notifications**: Real-time messaging and interactive workflows
+- **Azure Services**: OpenAI integration and cloud resource management
 
 ## Development Environment Setup
 
