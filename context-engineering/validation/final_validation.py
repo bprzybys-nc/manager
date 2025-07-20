@@ -37,8 +37,8 @@ def test_documentation_quality():
         else:
             print(f"  ❌ CLAUDE.md missing: {section}")
     
-    # Test INITIAL.md content
-    initial_path = manager_dir / "INITIAL.md"
+    # Test PLANNING.md content
+    initial_path = manager_dir / "PLANNING.md"
     with open(initial_path, 'r') as f:
         initial_content = f.read()
     
@@ -54,9 +54,9 @@ def test_documentation_quality():
     for section in required_initial_sections:
         if section in initial_content:
             initial_score += 1
-            print(f"  ✅ INITIAL.md contains: {section}")
+            print(f"  ✅ PLANNING.md contains: {section}")
         else:
-            print(f"  ❌ INITIAL.md missing: {section}")
+            print(f"  ❌ PLANNING.md missing: {section}")
     
     total_score = claude_score + initial_score
     max_score = len(required_claude_sections) + len(required_initial_sections)
@@ -170,7 +170,7 @@ def test_file_sizes():
     
     size_tests = [
         ("CLAUDE.md", manager_dir / "CLAUDE.md", 30000),  # Should be substantial
-        ("INITIAL.md", manager_dir / "INITIAL.md", 15000),  # Should be comprehensive
+        ("PLANNING.md", manager_dir / "PLANNING.md", 15000),  # Should be comprehensive
         ("CE README.md", manager_dir / "context-engineering" / "README.md", 8000),  # Should be detailed
         ("Execute PRP", manager_dir / "context-engineering" / "commands" / "execute-prp.md", 2000),
         ("Generate PRP", manager_dir / "context-engineering" / "commands" / "generate-prp.md", 3000),

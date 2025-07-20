@@ -67,8 +67,8 @@ def main():
         "Manager CLAUDE.md"
     ))
     validation_results.append(validate_file_exists(
-        manager_dir / "INITIAL.md", 
-        "Manager INITIAL.md"
+        manager_dir / "PLANNING.md",
+        "Manager PLANNING.md"
     ))
     validation_results.append(validate_file_exists(
         manager_dir / "VALIDATION.md", 
@@ -150,16 +150,16 @@ def main():
         "CLAUDE.md context engineering content"
     ))
     
-    # Check INITIAL.md for Manager context
+    # Check PLANNING.md for Manager context
     validation_results.append(validate_file_content(
-        manager_dir / "INITIAL.md",
+        manager_dir / "PLANNING.md",
         [
             "Manager Component",
             "GraphMCP Framework",
             "Context Engineering",
             "Cross-Component"
         ],
-        "INITIAL.md Manager context"
+        "PLANNING.md Manager context"
     ))
     
     # Check context engineering README

@@ -80,7 +80,7 @@
     "enableSecurityCheck": true
   },
   "processing": {
-    "compress": false,
+    "compress": true,
     "maxFileSize": "1MB",
     "maxTotalSize": "50MB"
   }
