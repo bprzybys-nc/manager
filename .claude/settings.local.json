@@ -155,7 +155,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "mcp__jetbrains__list_directory_tree_in_folder",
       "mcp__jetbrains__get_file_text_by_path",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "mcp__jetbrains__list_files_in_folder"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

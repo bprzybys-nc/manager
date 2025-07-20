@@ -14,6 +14,7 @@ from src.modules.incident import IncidentDB, IncidentRoute, QuestionDB
 from src.modules.inventory import InventoryDB, InventoryRoute
 from src.modules.metrics import MetricsRoute, Prometheus, Storage
 from src.modules.task import TaskDB, TaskRoute
+from src.usecases.database_decommissioning.app.api.routes import get_database_decommissioning_router
 
 app = FastAPI()
 
@@ -50,3 +51,14 @@ app.include_router(TaskRoute(task_db, incident_db, cmdb_metadata).router, prefix
 app.include_router(
     ChatRoute(prometheus, incident_db, inventory_db, db_client.client).router, prefix="/chat"
 )
+
+# Include database decommissioning use case routes
+@app.on_event("startup")
+async def startup_event():
+    # Initialize database decommissioning routes
+    db_decommission_router = await get_database_decommissioning_router(
+        db_client=db_client,
+        task_db=task_db,
+        celery_app=celery_app
+    )
+    app.include_router(db_decommission_router, prefix="/usecases/database-decommissioning")

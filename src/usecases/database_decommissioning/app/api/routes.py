@@ -31,23 +31,23 @@ from src.modules.task.db import TaskDB
 
 # Local imports
 from ..models import (
+    DatabaseDecommissionRequest,
+    DatabaseDecommissionResponse,
     WorkflowConfig, 
-    WorkflowExecutionResult, 
-    WorkflowExecutionRequest,
-    WorkflowStatusResponse,
-    WorkflowListResponse,
-    HealthCheckResponse,
+    WorkflowExecutionResult,
 )
-from ..orchestrator import DatabaseDecommissionOrchestrator, create_database_decommission_orchestrator
-from ..utils import create_logger_for_workflow, get_manager_database_client
-from ..validation import EnvironmentValidator, WorkflowValidator
+from ..orchestrator import DatabaseDecommissionOrchestrator
+from ..utils import create_logger_for_workflow, validate_environment_dependencies
+from ..validation.environment_validation import EnvironmentValidator
+from ..validation.workflow_validation import WorkflowValidator
 
 
+# Response models for API endpoints
 class WorkflowExecuteRequest(BaseModel):
-    """Request model for executing database decommissioning workflow."""
-    database_name: str = Field(..., description="Name of database to decommission")
-    repo_owner: str = Field(..., description="Repository owner/organization") 
-    repo_name: str = Field(..., description="Repository name")
+    """Request model for workflow execution."""
+    database_name: str = Field(..., description="Name of the database to decommission")
+    repo_owner: str = Field(..., description="GitHub repository owner")
+    repo_name: str = Field(..., description="GitHub repository name")
     tenant_id: Optional[str] = Field(None, description="Tenant identifier for multi-tenancy")
     user_id: Optional[str] = Field(None, description="User identifier")
     dry_run: bool = Field(False, description="Whether to perform a dry run without making changes")
@@ -57,6 +57,39 @@ class WorkflowExecuteRequest(BaseModel):
     max_parallel_steps: int = Field(4, description="Maximum parallel steps in workflow")
     default_timeout: int = Field(300, description="Default timeout for steps in seconds")
     stop_on_error: bool = Field(False, description="Whether to stop workflow on first error")
+
+
+class WorkflowListResponse(BaseModel):
+    """Response model for workflow listing."""
+    workflows: List[Dict[str, Any]]
+    total_count: int
+    offset: int
+    limit: int
+
+
+class WorkflowStatusResponse(BaseModel):
+    """Response model for workflow status."""
+    workflow_id: str
+    status: str
+    database_name: Optional[str] = None
+    tenant_id: Optional[str] = None
+    repository: Optional[str] = None
+    created_at: Optional[float] = None
+    completed_at: Optional[float] = None
+    duration: Optional[float] = None
+    success: Optional[bool] = None
+    progress: Optional[Dict[str, Any]] = None
+    summary: Optional[Dict[str, Any]] = None
+
+
+class HealthCheckResponse(BaseModel):
+    """Response model for health checks."""
+    status: str
+    timestamp: float
+    service: str
+    version: str
+    error: Optional[str] = None
+    checks: Dict[str, Any] = {}
 
 
 class DatabaseDecommissioningRoute:

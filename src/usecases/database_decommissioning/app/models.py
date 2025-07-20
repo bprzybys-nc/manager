@@ -498,6 +498,51 @@ class WorkflowExecutionRequest(BaseModel):
     stop_on_error: bool = Field(False, description="Whether to stop workflow on first error")
 
 
+# Workflow execution result models
+@dataclass
+class WorkflowExecutionResult:
+    """
+    Result from executing a database decommissioning workflow.
+    
+    Enhanced with Manager integration while preserving GraphMCP compatibility.
+    """
+    workflow_id: str
+    database_name: str
+    success: bool
+    duration: float
+    step_results: Dict[str, Any]
+    
+    # Manager-specific fields
+    tenant_id: Optional[str] = None
+    user_id: Optional[str] = None
+    
+    # GraphMCP compatibility fields
+    config: Optional[Dict[str, Any]] = None
+    summary: Optional[Dict[str, Any]] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return asdict(self)
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'WorkflowExecutionResult':
+        """Create instance from dictionary."""
+        return cls(**data)
+
+
+class WorkflowExecutionResultResponse(BaseModel):
+    """FastAPI response model for workflow execution results."""
+    workflow_id: str
+    database_name: str
+    success: bool
+    duration: float
+    step_results: Dict[str, Any]
+    tenant_id: Optional[str] = None
+    user_id: Optional[str] = None
+    config: Optional[Dict[str, Any]] = None
+    summary: Optional[Dict[str, Any]] = None
+
+
 # Error response models
 class ErrorResponse(BaseModel):
     """Standard error response model."""

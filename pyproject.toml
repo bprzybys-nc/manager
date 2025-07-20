@@ -23,4 +23,7 @@ dependencies = [
     "slack-bolt>=1.22.0",
     "streamlit>=1.43.2",
     "uvicorn>=0.34.0",
+    # Database decommissioning use case dependencies
+    "psutil>=6.1.0",
+    "python-dotenv>=1.0.0",
 ]

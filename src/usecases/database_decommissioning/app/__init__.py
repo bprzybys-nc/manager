@@ -29,10 +29,8 @@ from .models import (
     WorkflowStepResult,
 )
 
-from .workflow_orchestrator import (
+from .orchestrator import (
     DatabaseDecommissionOrchestrator,
-    create_workflow,
-    execute_workflow,
 )
 
 from .utils import (
@@ -59,8 +57,6 @@ __all__ = [
     "WorkflowStepResult",
     # Main orchestrator
     "DatabaseDecommissionOrchestrator",
-    "create_workflow",
-    "execute_workflow",
     # Utilities
     "extract_repo_details",
     "generate_workflow_id",
