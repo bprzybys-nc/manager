@@ -157,7 +157,10 @@
       "mcp__jetbrains__get_file_text_by_path",
       "Bash(touch:*)",
       "mcp__jetbrains__list_files_in_folder",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(.venv/bin/pytest --version)",
+      "Bash(uv pip install:*)",
+      "Bash(PYTHONPATH=. .venv/bin/python -m pytest tests/unit/ --verbose -m \"not e2e\" --tb=short)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",
