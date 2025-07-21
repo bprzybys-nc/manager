@@ -7,11 +7,8 @@ import asyncio
 import sys
 import os
 
-# Add src directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-from usecases.db_runbook_finder.state import WorkflowState
-from usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
+from src.usecases.db_runbook_finder.state import WorkflowState
+from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
 
 async def test_basic_workflow():
     """Test basic workflow functionality without complex logging."""

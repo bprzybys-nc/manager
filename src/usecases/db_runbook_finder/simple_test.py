@@ -5,8 +5,8 @@ Simple test script for DB Runbook Finder workflow.
 
 import asyncio
 import sys
-from state import WorkflowState
-from nodes import DBRunbookFinderNodes
+from src.usecases.db_runbook_finder.state import WorkflowState
+from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
 
 async def simple_workflow_test():
     """Test the workflow without complex logging to avoid JSON serialization issues."""

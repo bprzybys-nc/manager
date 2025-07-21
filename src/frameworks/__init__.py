@@ -6,7 +6,7 @@ This module contains reusable frameworks that can be used across multiple use ca
 
 # Import GraphMCP framework for easy access
 try:
-    from .graphmcp import *
+    from .graphmcp import get_logger, LoggingConfig
 except ImportError:
     # GraphMCP might not be installed or configured
     pass

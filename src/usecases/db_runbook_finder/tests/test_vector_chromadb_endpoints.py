@@ -24,8 +24,8 @@ def main():
     
     from fastapi.testclient import TestClient
     
-    # Manager root is always /Users/bprzybysz/nc-src/ovora/manager
-    manager_root = Path("/Users/bprzybysz/nc-src/ovora/manager")
+    # Manager root - use relative path from test file location
+    manager_root = Path(__file__).parent.parent.parent.parent
     env_file = manager_root / ".env"
     
     # Load environment variables from .env file

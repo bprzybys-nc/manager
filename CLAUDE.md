@@ -11,8 +11,9 @@ src/usecases/database_decommissioning/
 src/usecases/db_runbook_finder/
 src/frameworks/graphmcp/
 
-Read-Only Directories:
+Read-Only Directories (Uless instructed otherwise like e.g. "I allow you to make changes in 'graphmcp'"):
 All other directories, such as src/tools/, should be treated as stable, read-only libraries. You can and should use their functionality, but you must not alter their source code.
+
 
 ## Context Engineering Enabled
 
