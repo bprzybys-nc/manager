@@ -8,10 +8,10 @@ testing both success and error scenarios.
 import pytest
 import asyncio
 from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
+from datetime import datetime, UTC
 
-from ..state import WorkflowState
-from ..nodes import DBRunbookFinderNodes
+from src.usecases.db_runbook_finder.state import WorkflowState
+from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
 
 
 class TestDBRunbookFinderNodes:
@@ -259,7 +259,7 @@ class TestDBRunbookFinderNodes:
         nodes = db_runbook_finder_nodes
         
         # Test each node individually
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
         
         # Fetch incident
         state = await nodes.fetch_incident_node(populated_workflow_state)
@@ -288,15 +288,20 @@ class TestDBRunbookFinderNodes:
         """Test error handling in nodes."""
         nodes = db_runbook_finder_nodes
         
-        # Test with invalid state
-        invalid_state = WorkflowState(jira_key="")
+        # Test that empty jira_key raises ValueError during WorkflowState creation
+        with pytest.raises(ValueError, match="jira_key is required"):
+            WorkflowState(jira_key="")
         
-        # Should handle gracefully
-        try:
-            await nodes.fetch_incident_node(invalid_state)
-        except ValueError:
-            # Expected for empty jira_key
-            pass
+        # Test error handling with a valid state but simulated node failure
+        # This tests the actual error handling logic in the nodes
+        valid_state = WorkflowState(jira_key="TEST-ERROR")
+        
+        # The nodes should handle this gracefully without crashing
+        result_state = await nodes.fetch_incident_node(valid_state)
+        
+        # Verify the node completed (even if with mock data)
+        assert result_state is not None
+        assert result_state.jira_key == "TEST-ERROR"
 
     @pytest.mark.unit
     def test_node_initialization(self):

@@ -7,7 +7,7 @@ tracking all data and status throughout the workflow execution.
 
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, UTC
 
 
 @dataclass
@@ -33,8 +33,8 @@ class WorkflowState:
     runbooks: List[Dict[str, Any]] = field(default_factory=list)
     status: str = "PENDING"
     error_message: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     performance_metrics: Dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -59,7 +59,7 @@ class WorkflowState:
         """
         self.status = new_status
         self.error_message = error_message
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def add_performance_metric(self, operation: str, duration_seconds: float):
         """Add performance timing data.
@@ -156,8 +156,8 @@ class WorkflowState:
             WorkflowState instance
         """
         # Handle datetime fields
-        created_at = datetime.fromisoformat(data.get("created_at", datetime.utcnow().isoformat()))
-        updated_at = datetime.fromisoformat(data.get("updated_at", datetime.utcnow().isoformat()))
+        created_at = datetime.fromisoformat(data.get("created_at", datetime.now(UTC).isoformat()))
+        updated_at = datetime.fromisoformat(data.get("updated_at", datetime.now(UTC).isoformat()))
         
         return cls(
             jira_key=data["jira_key"],

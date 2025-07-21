@@ -8,11 +8,11 @@ including integration tests and end-to-end scenarios.
 import pytest
 import asyncio
 from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
+from datetime import datetime, UTC
 
-from ..state import WorkflowState
-from ..workflow import DBRunbookFinderWorkflow
-from ..nodes import DBRunbookFinderNodes
+from src.usecases.db_runbook_finder.state import WorkflowState
+from src.usecases.db_runbook_finder.workflow import DBRunbookFinderWorkflow
+from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
 
 
 class TestDBRunbookFinderWorkflow:
@@ -101,7 +101,7 @@ class TestDBRunbookFinderWorkflow:
         workflow = db_runbook_finder_workflow
         
         # Use a ticket that will trigger gap scenario
-        gap_ticket = "TEST-999"
+        gap_ticket = "GAP-999"
         
         # Execute full workflow
         result_state = await workflow.run(gap_ticket)
@@ -201,11 +201,11 @@ class TestDBRunbookFinderWorkflow:
         test_tickets = ["AGENT-6", "TEST-123", "OVR-999"]
         
         for ticket in test_tickets:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(UTC)
             
             result_state = await workflow.run(ticket)
             
-            end_time = datetime.utcnow()
+            end_time = datetime.now(UTC)
             actual_duration = (end_time - start_time).total_seconds()
             
             # Verify workflow completed under target time
@@ -319,12 +319,15 @@ class TestDBRunbookFinderWorkflow:
 
     @pytest.mark.unit
     @pytest.mark.asyncio
-    async def test_mock_workflow_execution_gap_path(self, db_runbook_finder_workflow, workflow_state_no_runbooks):
+    async def test_mock_workflow_execution_gap_path(self, db_runbook_finder_workflow):
         """Test mock workflow execution with gap path."""
         workflow = db_runbook_finder_workflow
         
-        # Execute mock workflow
-        result_state = await workflow._mock_workflow_execution(workflow_state_no_runbooks)
+        # Use a ticket that triggers gap scenario (unknown issue type)
+        gap_state = WorkflowState(jira_key="GAP-999")
+        
+        # Execute mock workflow - this will call nodes which should return empty results
+        result_state = await workflow._mock_workflow_execution(gap_state)
         
         # Should follow gap path
         assert result_state.status == "GAP_DETECTED"

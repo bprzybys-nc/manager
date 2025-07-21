@@ -7,7 +7,7 @@ Jira tickets and find relevant runbooks through semantic search.
 
 import time
 from typing import Dict, Any, List
-from ...frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
+from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
 from .state import WorkflowState
 
@@ -482,8 +482,11 @@ class DBRunbookFinderNodes:
         Returns:
             Mock Confluence search results
         """
-        # Simulate different responses based on query content
-        if "database" in query.lower() and "timeout" in query.lower():
+        # Simulate different responses based on query content and jira_key
+        if "GAP" in jira_key or "gap" in query.lower():
+            # Return empty results for gap scenario testing
+            return {"results": []}
+        elif "database" in query.lower() and "timeout" in query.lower():
             return {
                 "results": [
                     {
