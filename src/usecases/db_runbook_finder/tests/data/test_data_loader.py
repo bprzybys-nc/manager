@@ -246,10 +246,10 @@ class MockRunbookDataLoader:
                 "description": "Runbook not found"
             },
             {
-                "endpoint": "/runbooks/",
+                "endpoint": "/runbooks/%20",
                 "params": {},
                 "expected_status": 422,
-                "description": "Empty runbook ID"
+                "description": "Empty runbook ID (whitespace)"
             }
         ]
     

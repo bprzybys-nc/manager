@@ -51,10 +51,15 @@ def main():
     print(f"Status: {response.status_code}")
     print(f"Response: {response.text[:200]}...")
     
-    # Test 4: Empty runbook ID (tricky - FastAPI path parameter)
-    print("\\n4. Testing empty runbook ID")
-    # This is the tricky one - FastAPI might not even route empty path parameters
-    response = client.get("/runbooks/")
+    # Test 4: Empty runbook ID (using URL-encoded whitespace)
+    print("\\n4. Testing whitespace runbook ID")
+    response = client.get("/runbooks/%20")  # URL-encoded space
+    print(f"Status: {response.status_code}")
+    print(f"Response: {response.text[:200]}...")
+    
+    # Test 5: Try direct whitespace (might be handled differently)
+    print("\\n5. Testing direct whitespace runbook ID")
+    response = client.get("/runbooks/ ")  # Direct space
     print(f"Status: {response.status_code}")
     print(f"Response: {response.text[:200]}...")
     
