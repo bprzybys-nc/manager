@@ -2,7 +2,7 @@
   "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "mcp__repomix__pack_codebase"
+      "Bash(mkdir:*)"
     ],
     "deny": []
   },
