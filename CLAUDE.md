@@ -42,11 +42,47 @@ The Manager component uses specialized context assembly patterns:
 
 ### Context Engineering Files
 
-- **INITIAL.md**: Comprehensive feature specification with context engineering principles
-- **INITIAL.template.md**: Template for creating new feature specifications  
-- **CLAUDE.md**: This file - project-wide development guidance and patterns
+**Core Documentation:**
+- **CLAUDE.md**: This file - project-wide development guidance and patterns (c_instr)
+- **INITIAL.md**: Comprehensive feature specification with context engineering principles (c_query)
+- **INITIAL.template.md**: Template for creating new feature specifications (c_mem)
 
-Context engineering provides all necessary implementation details in INITIAL.md, eliminating the need for separate planning phases.
+**Context Engineering System** (`context-engineering/`):
+- **README.md**: Complete Manager context engineering system overview (c_instr)
+- **examples/**: Implementation patterns and best practices library (c_know)
+  - `graphmcp_workflow_patterns.py`: GraphMCP workflow implementation patterns
+  - `manager_api_patterns.py`: Manager FastAPI patterns and best practices
+  - `microservices_patterns.py`: Microservice tool patterns for external integrations
+  - `ai_integration_patterns.py`: Azure OpenAI and LangChain integration patterns
+  - `testing_patterns.py`: Comprehensive testing strategies and utilities
+- **templates/**: Feature, workflow, and service development templates (c_mem)
+  - `feature_request_template.md`: Manager-specific feature request template
+  - `workflow_template.md`: GraphMCP workflow development template
+  - `microservice_template.md`: Microservice tool development template
+  - `integration_template.md`: External service integration template
+- **commands/**: Context engineering workflow automation (c_tools)
+  - `generate-prp.md`: PRP generation command with comprehensive research
+  - `execute-prp.md`: PRP execution command for structured implementation
+  - `run_demo.md`: Demo execution command for workflow testing
+- **patterns/**: Architecture patterns and design decisions library (c_know)
+  - `manager_architecture_patterns.md`: Manager-specific architecture patterns
+- **validation/**: Quality assurance and validation framework (c_state)
+  - `validate_context_engineering.py`: Comprehensive validation system
+  - `final_validation.py`: Final quality assurance validation
+  - `validate_consolidation.py`: Project consolidation validation
+- **PRPs/**: Product Requirements Prompts for structured development (c_state)
+  - `active/`: Work in progress PRPs
+  - `completed/`: Completed and archived PRPs
+  - `templates/`: PRP templates and examples
+- **ARCHITECTURE.md**: Architecture decisions, design rationale, and evolution history (c_know)
+
+**Coleman Context Engineering Framework Mapping:**
+- **c_instr** (Instructions): `CLAUDE.md`, `context-engineering/README.md`
+- **c_know** (Knowledge): `context-engineering/examples/`, `context-engineering/patterns/`, `ARCHITECTURE.md`
+- **c_tools** (Tools): `context-engineering/commands/`, `.claude/` configuration
+- **c_mem** (Memory): `context-engineering/templates/`, `INITIAL.template.md`
+- **c_state** (State): `context-engineering/PRPs/`, `context-engineering/validation/`
+- **c_query** (Query): `INITIAL.md` files, feature specifications
 
 ## Project Overview
 
