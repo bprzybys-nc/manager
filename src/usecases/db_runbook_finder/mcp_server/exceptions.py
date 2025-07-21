@@ -76,3 +76,18 @@ class IncidentTrackingError(MCPRunbookError):
         else:
             message = f"Incident tracking failed for '{incident_id}' during {operation}"
         super().__init__(message)
+
+
+class ConfigurationError(MCPRunbookError):
+    """Configuration validation or loading failed."""
+    
+    def __init__(self, message: str):
+        super().__init__(f"Configuration error: {message}")
+
+
+class RunbookDiscoveryError(MCPRunbookError):
+    """Runbook discovery process failed."""
+    
+    def __init__(self, message: str, context: dict = None):
+        self.context = context or {}
+        super().__init__(f"Runbook discovery failed: {message}")

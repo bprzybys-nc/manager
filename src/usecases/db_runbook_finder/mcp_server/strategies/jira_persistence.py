@@ -7,7 +7,7 @@ with the existing Jira tool for incident tracking and runbook usage persistence.
 
 import asyncio
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import httpx
 import os
 from datetime import datetime

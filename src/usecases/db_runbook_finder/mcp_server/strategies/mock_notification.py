@@ -7,7 +7,7 @@ in-memory storage to simulate Slack notifications for development and testing.
 
 import asyncio
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 import random
 import uuid
