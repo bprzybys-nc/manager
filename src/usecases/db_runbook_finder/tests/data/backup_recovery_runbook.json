@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "title": "Database Backup and Recovery Procedures",
+    "space_key": "RUNBOOKS",
+    "page_id": "345678", 
+    "url": "https://company.atlassian.net/wiki/spaces/RUNBOOKS/pages/345678",
+    "created_at": "2024-01-05T08:00:00Z",
+    "updated_at": "2024-01-30T12:30:00Z",
+    "tags": ["database", "backup", "recovery", "disaster-recovery", "point-in-time", "postgresql", "mysql"]
+  },
+  "procedures": [
+    {
+      "step": 1,
+      "description": "Create full database backup",
+      "command": "pg_dump -h localhost -U postgres -d production > backup_$(date +%Y%m%d).sql",
+      "expected_result": "Complete database dump file created successfully"
+    },
+    {
+      "step": 2,
+      "description": "Verify backup integrity",
+      "command": "pg_restore --list backup_$(date +%Y%m%d).sql | head -20",
+      "expected_result": "Backup file structure and contents are valid"
+    },
+    {
+      "step": 3,
+      "description": "Test backup restoration on staging environment",
+      "command": "pg_restore -h staging-db -U postgres -d staging_db backup_file.sql",
+      "expected_result": "Backup restores successfully without errors"
+    },
+    {
+      "step": 4,
+      "description": "Perform point-in-time recovery if needed",
+      "command": "pg_basebackup -D /backup/base -Ft -z -P",
+      "expected_result": "Base backup with WAL files for point-in-time recovery"
+    }
+  ],
+  "troubleshooting_steps": [
+    {
+      "symptom": "Backup process fails or times out",
+      "possible_causes": ["Insufficient disk space", "Database locks", "Network issues"],
+      "resolution": "Free up disk space, schedule backups during low activity periods, check network connectivity"
+    },
+    {
+      "symptom": "Recovery process fails",
+      "possible_causes": ["Corrupted backup files", "Version incompatibility", "Missing dependencies"],
+      "resolution": "Verify backup integrity, ensure version compatibility, check for required extensions"
+    },
+    {
+      "symptom": "Data inconsistency after recovery",
+      "possible_causes": ["Incomplete backup", "Transaction log issues", "Concurrent modifications"],
+      "resolution": "Verify backup completeness, check transaction logs, implement proper backup procedures"
+    }
+  ],
+  "prerequisites": [
+    "Database administrator privileges",
+    "Sufficient storage space for backups",
+    "Access to backup storage location",
+    "Staging environment for testing"
+  ],
+  "raw_content": "# Database Backup and Recovery\n\nCritical procedures for ensuring data protection and disaster recovery capabilities.\n\n## Backup Types\n- Full database backups\n- Incremental backups\n- Point-in-time recovery backups\n- Binary backups for large databases\n\n## Recovery Scenarios\n- Complete system failure\n- Data corruption\n- Accidental data deletion\n- Point-in-time restoration\n\n## Best Practices\n- Regular backup testing\n- Automated backup verification\n- Offsite backup storage\n- Documentation of recovery procedures",
+  "structured_sections": {
+    "overview": "Comprehensive database backup and recovery procedures",
+    "scope": "Production and staging database environments",
+    "severity": "Critical - data protection and business continuity",
+    "estimated_time": "45-90 minutes depending on database size"
+  }
+}

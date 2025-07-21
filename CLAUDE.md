@@ -8,11 +8,12 @@ This project uses **Context Engineering** - a systematic approach to providing A
 
 ### Context Engineering Workflow
 
-1. **Feature Request**: Start with detailed `INITIAL.md` template
+1. **Feature Request**: Start with detailed `INITIAL.md` following context engineering template
 2. **Research**: Manually research existing patterns and architecture
-3. **PRP Creation**: Use `/generate-prp INITIAL.md` to create comprehensive Product Requirements Prompt
-4. **Implementation**: Use `/execute-prp PRPs/active/<feature_name>.md` for structured implementation
-5. **Validation**: Follow validation gates defined in the PRP
+3. **Implementation**: Direct implementation using comprehensive context from INITIAL.md
+4. **Validation**: Follow validation requirements specified in context documentation
+
+**Note**: PLANNING.md and PRP-based workflows have been simplified to direct implementation using comprehensive INITIAL.md context specifications.
 
 ### Manager-Specific Context Assembly
 
@@ -26,12 +27,13 @@ The Manager component uses specialized context assembly patterns:
 - **Performance Requirements**: Response time, resource usage, and scalability considerations
 - **Security Context**: Authentication, authorization, and data protection patterns
 
-### Context Engineering Commands
+### Context Engineering Files
 
-- `/generate-prp <initial_file>` - Create comprehensive Product Requirements Prompt
-- `/execute-prp <prp_file>` - Execute implementation with full context
+- **INITIAL.md**: Comprehensive feature specification with context engineering principles
+- **INITIAL.template.md**: Template for creating new feature specifications  
+- **CLAUDE.md**: This file - project-wide development guidance and patterns
 
-See `.claude/commands/` for detailed command documentation.
+Context engineering provides all necessary implementation details in INITIAL.md, eliminating the need for separate planning phases.
 
 ## Project Overview
 
@@ -44,3 +46,35 @@ SysAIdmin (Ovora) is an AI-powered system administration platform with three mai
 ### Development Specifics
 
 - **Python Logic Tests**: py logic tests are ran from project's root dir using .venv/bin/python
+- **Keep Workflows' Tests**: keep workflowss' tests in their dir tests dir
+
+### DB Runbook Finder Workflow
+
+- **Location**: `manager/src/usecases/db_runbook_finder/`
+- **Purpose**: AI-powered database runbook discovery and semantic search using ChromaDB vector database
+- **Features**: 
+  - Semantic search with sentence-transformers embeddings
+  - Confluence integration for runbook extraction
+  - Comprehensive test data with 5 mock database runbooks
+  - Full endpoint coverage testing (health, CRUD, search, bulk operations)
+  - Job management for asynchronous bulk operations
+  - Vector database persistence with ChromaDB
+- **Testing**: `tests/` directory contains mock data, test utilities, and comprehensive endpoint tests
+- **Integration**: Uses existing Confluence and Jira tools, GraphMCP framework patterns
+
+## CRITICAL RULE: Python Environment Management
+
+**THERE IS ONLY ONE PYTHON VIRTUAL ENVIRONMENT: `<manager_project_root>/.venv`**
+
+- **ALL Python code execution MUST use**: `/Users/bprzybysz/nc-src/ovora/manager/.venv/bin/python`
+- **ALL pytest execution MUST use**: `cd /Users/bprzybysz/nc-src/ovora/manager && .venv/bin/python -m pytest`
+- **NO other virtual environments are allowed** - not `uv run`, not tool-specific venvs, not conda, nothing else
+- **ALL Python dependencies** for the entire manager project are managed through the single `pyproject.toml` at manager root
+- **ALL microservice tools** (jira, confluence, etc.) dependencies are included in the manager's main environment
+- **NO exceptions to this rule** - if something doesn't work, fix the imports/paths, don't create new environments
+
+### Why This Rule Exists
+- Ensures consistent dependency management across all components
+- Prevents import path conflicts between different tools
+- Simplifies testing and development workflows
+- Maintains single source of truth for all Python dependencies

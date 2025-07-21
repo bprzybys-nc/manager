@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "title": "Database Security Hardening and Access Control",
+    "space_key": "RUNBOOKS",
+    "page_id": "456789",
+    "url": "https://company.atlassian.net/wiki/spaces/RUNBOOKS/pages/456789", 
+    "created_at": "2024-01-08T11:45:00Z",
+    "updated_at": "2024-02-01T09:30:00Z",
+    "tags": ["database", "security", "hardening", "access-control", "encryption", "authentication"]
+  },
+  "procedures": [
+    {
+      "step": 1,
+      "description": "Audit current database user accounts and permissions",
+      "command": "SELECT usename, usesuper, usecreatedb, usebypassrls FROM pg_user;",
+      "expected_result": "List of all database users with their privilege levels"
+    },
+    {
+      "step": 2,
+      "description": "Enable SSL encryption for database connections",
+      "command": "ALTER SYSTEM SET ssl = 'on'; SELECT pg_reload_conf();",
+      "expected_result": "SSL encryption enabled for all database connections"
+    },
+    {
+      "step": 3,
+      "description": "Configure row-level security policies",
+      "command": "ALTER TABLE sensitive_data ENABLE ROW LEVEL SECURITY;",
+      "expected_result": "Row-level security enabled for sensitive tables"
+    },
+    {
+      "step": 4,
+      "description": "Set up database audit logging",
+      "command": "ALTER SYSTEM SET log_statement = 'all'; SELECT pg_reload_conf();",
+      "expected_result": "All database statements are logged for audit purposes"
+    }
+  ],
+  "troubleshooting_steps": [
+    {
+      "symptom": "Authentication failures after security changes",
+      "possible_causes": ["SSL certificate issues", "Changed authentication methods", "Network configuration"],
+      "resolution": "Verify SSL certificates, check pg_hba.conf settings, validate network connectivity"
+    },
+    {
+      "symptom": "Performance impact from audit logging",
+      "possible_causes": ["Excessive logging", "Slow log storage", "Log rotation issues"],
+      "resolution": "Optimize logging levels, improve log storage performance, implement proper log rotation"
+    },
+    {
+      "symptom": "Access denied errors for legitimate users",
+      "possible_causes": ["Overly restrictive policies", "Role assignment issues", "Permission inheritance problems"],
+      "resolution": "Review security policies, verify role assignments, check permission inheritance"
+    }
+  ],
+  "prerequisites": [
+    "Database superuser privileges",
+    "SSL certificates configured",
+    "Security policy documentation",
+    "Audit logging storage configured"
+  ],
+  "raw_content": "# Database Security Hardening\n\nEssential procedures for implementing comprehensive database security measures and access controls.\n\n## Security Layers\n- Network security (firewalls, VPNs)\n- Authentication and authorization\n- Data encryption (at rest and in transit)\n- Audit logging and monitoring\n- Row-level and column-level security\n\n## Compliance Requirements\n- GDPR data protection\n- SOC 2 security controls\n- PCI DSS compliance\n- Industry-specific regulations\n\n## Security Best Practices\n- Principle of least privilege\n- Regular security audits\n- Automated vulnerability scanning\n- Incident response procedures",
+  "structured_sections": {
+    "overview": "Database security hardening and access control implementation",
+    "scope": "All production database environments",
+    "severity": "Critical - security and compliance",
+    "estimated_time": "60-120 minutes"
+  }
+}

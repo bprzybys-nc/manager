@@ -671,6 +671,9 @@ async def search_runbooks(
             processing_time=processing_time
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except RuntimeError as e:

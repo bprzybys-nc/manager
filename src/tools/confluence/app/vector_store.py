@@ -335,9 +335,14 @@ class VectorStore:
             query_embedding = self._generate_embeddings(query.strip())
 
             # Prepare search parameters
+            collection_count = self._collection.count()
+            if collection_count == 0:
+                # Return empty results for empty collection
+                return []
+                
             search_params = {
                 "query_embeddings": [query_embedding],
-                "n_results": min(n_results, self._collection.count()),
+                "n_results": min(n_results, collection_count),
                 "include": ["documents", "metadatas", "distances"],
             }
 
