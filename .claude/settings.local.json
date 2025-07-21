@@ -2,7 +2,7 @@
   "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "Bash(python:*)"
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   },
