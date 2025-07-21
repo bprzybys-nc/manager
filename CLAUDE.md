@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Scope and Boundaries
+
+You have read-access to the entire repository to understand the full context. However, code modifications are strictly limited to the following designated areas:
+
+Editable Directories:
+src/usecases/database_decommissioning/
+src/usecases/db_runbook_finder/
+src/frameworks/graphmcp/
+
+Read-Only Directories:
+All other directories, such as src/tools/, should be treated as stable, read-only libraries. You can and should use their functionality, but you must not alter their source code.
+
 ## Context Engineering Enabled
 
 This project uses **Context Engineering** - a systematic approach to providing AI assistants with comprehensive, structured context for dramatically improved code generation and implementation accuracy. This is 10x better than prompt engineering and 100x better than basic AI coding.
@@ -150,19 +162,45 @@ def test_semantic_search():
 - **Single Environment**: All dependencies managed in manager's .venv
 - **Structured Logging**: Correlation IDs and comprehensive error tracking
 
-## CRITICAL RULE: Python Environment Management
 
-**THERE IS ONLY ONE PYTHON VIRTUAL ENVIRONMENT: `<manager_project_root>/.venv`**
+## CRITICAL RULE: Unified Python Environment Management
 
-- **ALL Python code execution MUST use**: `/Users/bprzybysz/nc-src/ovora/manager/.venv/bin/python`
-- **ALL pytest execution MUST use**: `cd /Users/bprzybysz/nc-src/ovora/manager && .venv/bin/python -m pytest`
-- **NO other virtual environments are allowed** - not `uv run`, not tool-specific venvs, not conda, nothing else
-- **ALL Python dependencies** for the entire manager project are managed through the single `pyproject.toml` at manager root
-- **ALL microservice tools** (jira, confluence, etc.) dependencies are included in the manager's main environment
-- **NO exceptions to this rule** - if something doesn't work, fix the imports/paths, don't create new environments
+### The Guiding Principle: One Project, One Environment
 
-### Why This Rule Exists
-- Ensures consistent dependency management across all components
-- Prevents import path conflicts between different tools
-- Simplifies testing and development workflows
-- Maintains single source of truth for all Python dependencies
+The `manager` project operates from a **single, unified virtual environment** located at the project root: `/.venv`. This environment contains all dependencies for the core application, all tools, and all use cases. There are no other virtual environments.
+
+### How to Execute Code
+
+There are two correct ways to run Python code, depending on the context:
+
+**1. For Automation (`Makefile`, Scripts, CI/CD): Use `uv run`**
+
+This is the preferred method for all automated tasks. `uv run` automatically detects and uses the project's `.venv` without requiring activation.
+
+-   **To run a script:** `uv run python src/main.py`
+-   **To run tests:** `uv run pytest`
+-   **To run a tool:** `uv run ruff check .`
+
+**2. For Interactive Development (Your Shell): Activate the Environment First**
+
+When working directly in your terminal, activate the environment to ensure all commands use the correct interpreter and packages.
+
+-   **Activation:** `source .venv/bin/activate`
+-   **After activation, use standard commands:** `python`, `pytest`, `black`, etc.
+
+*Under no circumstances should you use hardcoded paths like `/Users/bprzybysz/.../.venv/bin/python`.*
+
+### How to Manage Dependencies
+
+**The `pyproject.toml` at the project root is the single source of truth for all dependencies.**
+
+-   **To install or update dependencies:** Run `uv sync` from the project root. This command will install everything specified in `pyproject.toml`.
+-   **To add a new dependency:** Run `uv add `. This will add the package to `pyproject.toml` and install it.
+-   **To add a new development dependency:** Run `uv add --dev `.
+
+### Why This Unified Approach Is Critical
+
+-   **Consistency**: Ensures all developers, scripts, and CI/CD pipelines use the exact same set of dependencies, eliminating "it works on my machine" issues.
+-   **Simplicity**: Prevents a complex web of conflicting, nested virtual environments.
+-   **Maintainability**: A single `pyproject.toml` file makes dependency updates and audits straightforward.
+-   **Robust Tooling**: Aligns with the idiomatic usage of `uv`, making our `Makefile` and automation scripts cleaner and more reliable.
