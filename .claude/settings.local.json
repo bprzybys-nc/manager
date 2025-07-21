@@ -2,7 +2,7 @@
   "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)"
+      "mcp__repomix__pack_codebase"
     ],
     "deny": []
   },
