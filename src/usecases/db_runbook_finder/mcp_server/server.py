@@ -8,7 +8,7 @@ health checks, and strategy orchestration for the quadruple strategy pattern.
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional, Callable
-from datetime import datetime
+from datetime import datetime, UTC
 import uuid
 import time
 
@@ -64,7 +64,7 @@ class RunbookRepositoryServer:
         
         # Server metadata
         self.server_id = str(uuid.uuid4())
-        self.start_time = datetime.utcnow()
+        self.start_time = datetime.now(UTC)
         
         logger.info(f"RunbookRepositoryServer initialized with ID: {self.server_id}")
     

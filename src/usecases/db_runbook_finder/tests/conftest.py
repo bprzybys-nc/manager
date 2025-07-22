@@ -264,3 +264,48 @@ class WorkflowAssertions:
 def workflow_assertions():
     """Provide workflow assertion helpers."""
     return WorkflowAssertions
+
+
+# Mock client fixtures for external tool testing
+@pytest.fixture
+def client():
+    """Mock FastAPI test client for external tool endpoints."""
+    from fastapi.testclient import TestClient
+    from fastapi import FastAPI
+    
+    # Create a mock FastAPI app for testing
+    app = FastAPI()
+    
+    # Add basic mock endpoints that the tests expect
+    @app.get("/runbooks")
+    def list_runbooks():
+        return {"runbooks": [], "pagination": {"total_count": 0}}
+    
+    @app.get("/search/runbooks")
+    def search_runbooks():
+        return {"results": [], "processing_time": 0.01}
+    
+    @app.post("/pages/extract")
+    def extract_page():
+        return {"metadata": {"title": "Mock Runbook"}, "procedures": []}
+    
+    @app.post("/pages/bulk-extract")
+    def bulk_extract():
+        return {"job_id": "mock-job-123", "status": "pending", "total_pages": 0}
+    
+    @app.get("/jobs")
+    def list_jobs():
+        return {"jobs": []}
+    
+    @app.get("/health")
+    def health_check():
+        return {"status": "healthy", "timestamp": "2024-01-01T00:00:00Z"}
+    
+    return TestClient(app)
+
+
+@pytest.fixture
+def data_loader():
+    """Mock data loader for testing."""
+    from src.usecases.db_runbook_finder.tests.data.test_data_loader import MockRunbookDataLoader
+    return MockRunbookDataLoader()

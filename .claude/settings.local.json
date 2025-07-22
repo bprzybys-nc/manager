@@ -179,7 +179,13 @@
       "Bash(mv:*)",
       "Bash(python -m pytest tests/test_comprehensive_chromadb_endpoints.py -v --tb=short)",
       "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_comprehensive_chromadb_endpoints.py -v --tb=short)",
-      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -v --tb=short)"
+      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -v --tb=short)",
+      "mcp__jetbrains__find_files_by_name_substring",
+      "mcp__jetbrains__list_directory_tree_in_folder",
+      "mcp__jetbrains__get_file_text_by_path",
+      "mcp__jetbrains__search_in_files_content",
+      "mcp__jetbrains__execute_terminal_command",
+      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/ -v --tb=short)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",
