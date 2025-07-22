@@ -23,7 +23,7 @@ project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.usecases.db_runbook_finder.mcp_server.strategy_factory import StrategyFactory, StrategyConfig
-from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryMCPServer
+from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryServer
 from src.usecases.db_runbook_finder.mcp_server.client import RunbookRepositoryMCPClient
 from src.usecases.db_runbook_finder.mcp_server.config import MCPServerConfig
 from src.usecases.db_runbook_finder.workflow import DBRunbookFinderWorkflow
@@ -273,7 +273,7 @@ class PRPValidator:
             factory = StrategyFactory(config=config)
             strategies = await factory.create_all_strategies()
             
-            server = RunbookRepositoryMCPServer(
+            server = RunbookRepositoryServer(
                 discovery_strategy=strategies["discovery"],
                 vector_strategy=strategies["vector"],
                 persistence_strategy=strategies["persistence"],

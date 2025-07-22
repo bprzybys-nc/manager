@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 from unittest.mock import patch
 
-from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryMCPServer
+from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryServer
 from src.usecases.db_runbook_finder.mcp_server.strategy_factory import StrategyFactory, StrategyConfig
 from src.usecases.db_runbook_finder.mcp_server.client import RunbookRepositoryMCPClient
 
@@ -38,7 +38,7 @@ class TestMCPServerIntegration:
         """Create MCP server with all strategies."""
         strategies = await strategy_factory.create_all_strategies()
         
-        return RunbookRepositoryMCPServer(
+        return RunbookRepositoryServer(
             discovery_strategy=strategies["discovery"],
             vector_strategy=strategies["vector"],
             persistence_strategy=strategies["persistence"],

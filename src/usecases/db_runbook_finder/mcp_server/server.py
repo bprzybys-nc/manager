@@ -31,7 +31,7 @@ from .exceptions import (
 logger = logging.getLogger(__name__)
 
 
-class RunbookRepositoryMCPServer:
+class RunbookRepositoryServer:
     """
     Main MCP server implementation for runbook repository operations.
     

@@ -14,7 +14,7 @@ from .state import WorkflowState
 from .nodes import DBRunbookFinderNodes
 from .mcp_server.client import RunbookRepositoryMCPClient
 from .mcp_server.strategy_factory import StrategyFactory, StrategyConfig
-from .mcp_server.server import RunbookRepositoryMCPServer
+from .mcp_server.server import RunbookRepositoryServer
 
 
 class DBRunbookFinderWorkflow:
@@ -45,7 +45,7 @@ class DBRunbookFinderWorkflow:
         
         # Initialize MCP server components if enabled
         self._mcp_client: Optional[RunbookRepositoryMCPClient] = None
-        self._mcp_server: Optional[RunbookRepositoryMCPServer] = None
+        self._mcp_server: Optional[RunbookRepositoryServer] = None
         self._strategy_factory: Optional[StrategyFactory] = None
         
         if self.use_mcp_server:
@@ -98,7 +98,7 @@ class DBRunbookFinderWorkflow:
             if self._mcp_server is None:
                 strategies = await self._strategy_factory.create_all_strategies()
                 
-                self._mcp_server = RunbookRepositoryMCPServer(
+                self._mcp_server = RunbookRepositoryServer(
                     discovery_strategy=strategies["discovery"],
                     vector_strategy=strategies["vector"],
                     persistence_strategy=strategies["persistence"],

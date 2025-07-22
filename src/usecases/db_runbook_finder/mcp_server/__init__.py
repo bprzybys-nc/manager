@@ -6,7 +6,7 @@ discovery and management operations using a quadruple strategy pattern.
 """
 
 from .client import RunbookRepositoryMCPClient
-from .server import RunbookRepositoryMCPServer
+from .server import RunbookRepositoryServer
 from .exceptions import (
     MCPRunbookError,
     RunbookNotFoundError,
@@ -16,7 +16,7 @@ from .exceptions import (
 
 __all__ = [
     "RunbookRepositoryMCPClient",
-    "RunbookRepositoryMCPServer", 
+    "RunbookRepositoryServer",
     "MCPRunbookError",
     "RunbookNotFoundError",
     "VectorSearchError",
