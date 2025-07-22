@@ -170,7 +170,16 @@
       "Bash(python:*)",
       "Bash(mkdir:*)",
       "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run python -c \"\nfrom src.usecases.db_runbook_finder.mcp_server.strategies.mock_discovery import MockDiscoveryStrategy\nfrom src.usecases.db_runbook_finder.mcp_server.strategies.protocols import AbstractDiscoveryStrategy\nimport inspect\n\n# Check if MockDiscoveryStrategy properly inherits from AbstractDiscoveryStrategy\nstrategy = MockDiscoveryStrategy()\nprint(f''MockDiscoveryStrategy is instance of AbstractDiscoveryStrategy: {isinstance(strategy, AbstractDiscoveryStrategy)}'')\n\n# Check method signatures match\nabc_methods = [method for method in dir(AbstractDiscoveryStrategy) if not method.startswith(''_'')]\nmock_methods = [method for method in dir(MockDiscoveryStrategy) if not method.startswith(''_'')]\n\nprint(f''ABC methods: {sorted(abc_methods)}'')\nprint(f''Mock methods: {sorted([m for m in mock_methods if m in abc_methods])}'')\n\n# Check specific method signatures\nfor method_name in abc_methods:\n    if hasattr(AbstractDiscoveryStrategy, method_name):\n        abc_method = getattr(AbstractDiscoveryStrategy, method_name)\n        if hasattr(MockDiscoveryStrategy, method_name):\n            mock_method = getattr(MockDiscoveryStrategy, method_name)\n            abc_sig = str(inspect.signature(abc_method)) if callable(abc_method) else ''N/A''\n            mock_sig = str(inspect.signature(mock_method)) if callable(mock_method) else ''N/A''\n            print(f''{method_name}: ABC={abc_sig}, Mock={mock_sig}'')\n\")",
-      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run python:*)"
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run python:*)",
+      "Bash(ls:*)",
+      "mcp__jetbrains__get_open_in_editor_file_path",
+      "mcp__jetbrains__get_open_in_editor_file_text",
+      "Bash(sed:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(python -m pytest tests/test_comprehensive_chromadb_endpoints.py -v --tb=short)",
+      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_comprehensive_chromadb_endpoints.py -v --tb=short)",
+      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -v --tb=short)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

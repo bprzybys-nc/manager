@@ -109,7 +109,7 @@ async def discover_runbooks(self, spaces: List[str]) -> List[Dict]:
 
 ### MCP Server Structure
 ```python
-class RunbookRepositoryMCPServer(BaseMCPClient):
+class RunbookRepositoryServer(BaseMCPClient):
     SERVER_NAME = "runbook_repository"
     
     def __init__(self, config_path: str):

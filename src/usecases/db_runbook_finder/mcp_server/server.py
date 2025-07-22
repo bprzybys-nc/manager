@@ -66,7 +66,7 @@ class RunbookRepositoryServer:
         self.server_id = str(uuid.uuid4())
         self.start_time = datetime.utcnow()
         
-        logger.info(f"RunbookRepositoryMCPServer initialized with ID: {self.server_id}")
+        logger.info(f"RunbookRepositoryServer initialized with ID: {self.server_id}")
     
     def _register_tools(self) -> None:
         """Register all available MCP tools."""
