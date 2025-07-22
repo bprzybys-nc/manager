@@ -20,7 +20,7 @@ from .strategies.protocols import (
 # Real implementations
 from .strategies.confluence_discovery import ConfluenceRunbookStrategy
 from .strategies.chromadb_vector import ChromaDBVectorStrategy
-from .strategies.jira_persistence import JiraDataStrategy
+from .strategies.jira_persistence import JiraPersistenceStrategy
 from .strategies.slack_notification import SlackNotificationStrategy
 
 logger = logging.getLogger(__name__)
@@ -132,9 +132,9 @@ class StrategyFactory:
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
-                    from .strategies.mock_discovery import MockRunbookStrategy
-                    strategy = MockRunbookStrategy()
-                    logger.info(f"Created MOCK discovery strategy: MockRunbookStrategy")
+                    from .strategies.mock_discovery import MockDiscoveryStrategy
+                    strategy = MockDiscoveryStrategy()
+                    logger.info(f"Created MOCK discovery strategy: MockDiscoveryStrategy")
                     return strategy
                     
             except Exception as e:
@@ -143,9 +143,9 @@ class StrategyFactory:
         
         # Fallback to mock if all else fails
         try:
-            from .strategies.mock_discovery import MockRunbookStrategy
-            strategy = MockRunbookStrategy()
-            logger.warning("All discovery strategies failed, falling back to MockRunbookStrategy")
+            from .strategies.mock_discovery import MockDiscoveryStrategy
+            strategy = MockDiscoveryStrategy()
+            logger.warning("All discovery strategies failed, falling back to MockDiscoveryStrategy")
             return strategy
         except ImportError:
             logger.error("Mock strategy not available, using basic ConfluenceRunbookStrategy")
@@ -222,23 +222,23 @@ class StrategyFactory:
             try:
                 if tier == ImplementationTier.REAL:
                     if await self._check_service_availability("jira", self.config.jira_url):
-                        strategy = JiraDataStrategy(
+                        strategy = JiraPersistenceStrategy(
                             base_url=self.config.jira_url,
                             timeout=self.config.timeout
                         )
                         if await strategy.health_check():
-                            logger.info(f"Created REAL persistence strategy: JiraDataStrategy")
+                            logger.info(f"Created REAL persistence strategy: JiraPersistenceStrategy")
                             return strategy
                         else:
                             await strategy.close()
                             
                 elif tier == ImplementationTier.WORKING:
                     # Working implementation with in-memory fallbacks
-                    strategy = JiraDataStrategy(
+                    strategy = JiraPersistenceStrategy(
                         base_url=self.config.jira_url,
                         timeout=self.config.timeout
                     )
-                    logger.info(f"Created WORKING persistence strategy: JiraDataStrategy")
+                    logger.info(f"Created WORKING persistence strategy: JiraPersistenceStrategy")
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
@@ -258,8 +258,8 @@ class StrategyFactory:
             logger.warning("All persistence strategies failed, falling back to MockDataStrategy")
             return strategy
         except ImportError:
-            logger.error("Mock strategy not available, using basic JiraDataStrategy")
-            return JiraDataStrategy(
+            logger.error("Mock strategy not available, using basic JiraPersistenceStrategy")
+            return JiraPersistenceStrategy(
                 base_url=self.config.jira_url,
                 timeout=self.config.timeout
             )

@@ -7,7 +7,7 @@ inheritance requirements.
 """
 
 from typing import Protocol, List, Dict, Any, Optional
-import abc
+from abc import ABC, abstractmethod
 
 
 class RunbookDiscoveryStrategy(Protocol):
@@ -340,3 +340,179 @@ class NotificationStrategy(Protocol):
             Message ID
         """
         ...
+
+
+# Abstract Base Classes for drift detection and concrete interface validation
+# These provide explicit inheritance-based contracts that complement the Protocol interfaces
+
+class AbstractDiscoveryStrategy(ABC):
+    """
+    Abstract base class implementing RunbookDiscoveryStrategy protocol.
+    
+    Provides concrete method signatures that help detect interface drift
+    and ensure all implementations maintain consistent contracts.
+    """
+    
+    @abstractmethod
+    async def discover_runbooks(self, spaces: List[str]) -> List[Dict[str, Any]]:
+        """Discover runbooks in specified spaces."""
+        pass
+    
+    @abstractmethod
+    async def get_runbook_content(self, runbook_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve specific runbook content."""
+        pass
+    
+    @abstractmethod
+    async def validate_runbook_content(self, page: Dict[str, Any]) -> bool:
+        """Validate runbook content structure."""
+        pass
+    
+    @abstractmethod
+    async def extract_runbook_metadata(self, page: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract metadata from runbook page."""
+        pass
+    
+    @abstractmethod
+    async def search_runbooks_by_query(self, query: str, spaces: Optional[List[str]] = None, limit: int = 10) -> List[Dict[str, Any]]:
+        """Search runbooks by text query."""
+        pass
+    
+    async def health_check(self) -> bool:
+        """Default health check implementation."""
+        return True
+
+
+class AbstractVectorStrategy(ABC):
+    """
+    Abstract base class implementing VectorStorageStrategy protocol.
+    
+    Ensures all vector storage implementations maintain consistent interfaces
+    and helps detect breaking changes in the contract.
+    """
+    
+    @abstractmethod
+    async def store_runbook_embedding(self, runbook_id: str, content: str, metadata: Dict[str, Any]) -> bool:
+        """Store runbook with vector embedding."""
+        pass
+    
+    @abstractmethod
+    async def search_similar_runbooks(self, query: str, limit: int = 5, min_score: float = 0.0) -> List[Dict[str, Any]]:
+        """Semantic search for similar runbooks."""
+        pass
+    
+    @abstractmethod
+    async def update_runbook_embedding(self, runbook_id: str, content: str, metadata: Dict[str, Any]) -> bool:
+        """Update existing runbook embedding."""
+        pass
+    
+    @abstractmethod
+    async def delete_runbook_embedding(self, runbook_id: str) -> bool:
+        """Delete runbook from vector store."""
+        pass
+    
+    @abstractmethod
+    async def get_collection_stats(self) -> Dict[str, Any]:
+        """Get vector store collection statistics."""
+        pass
+    
+    @abstractmethod
+    async def list_stored_runbooks(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+        """List all stored runbooks with pagination."""
+        pass
+    
+    async def health_check(self) -> bool:
+        """Default health check implementation."""
+        return True
+
+
+class AbstractPersistenceStrategy(ABC):
+    """
+    Abstract base class implementing DataPersistenceStrategy protocol.
+    
+    Provides explicit contract validation for data persistence operations
+    and incident management functionality.
+    """
+    
+    @abstractmethod
+    async def save_runbook_usage(self, runbook_id: str, usage_context: Dict[str, Any]) -> str:
+        """Track runbook usage for effectiveness metrics."""
+        pass
+    
+    @abstractmethod
+    async def get_runbook_metrics(self, runbook_id: str) -> Dict[str, Any]:
+        """Retrieve usage and effectiveness metrics."""
+        pass
+    
+    @abstractmethod
+    async def create_incident_ticket(self, runbook_id: str, context: Dict[str, Any]) -> str:
+        """Create incident ticket linked to runbook usage."""
+        pass
+    
+    @abstractmethod
+    async def update_ticket_status(self, ticket_id: str, status: str, comment: Optional[str] = None) -> bool:
+        """Update incident ticket with runbook execution results."""
+        pass
+    
+    @abstractmethod
+    async def get_incident_history(self, incident_id: str) -> Dict[str, Any]:
+        """Get complete incident history including runbook usage."""
+        pass
+    
+    @abstractmethod
+    async def track_runbook_effectiveness(self, runbook_id: str, incident_id: str, success: bool, 
+                                        resolution_time: float, notes: Optional[str] = None) -> bool:
+        """Track runbook effectiveness for continuous improvement."""
+        pass
+    
+    async def health_check(self) -> bool:
+        """Default health check implementation."""
+        return True
+
+
+class AbstractNotificationStrategy(ABC):
+    """
+    Abstract base class implementing NotificationStrategy protocol.
+    
+    Ensures consistent notification and communication interfaces across
+    all implementation tiers (Real, Working, Mock).
+    """
+    
+    @abstractmethod
+    async def send_runbook_notification(self, channel: str, runbook_id: str, context: Dict[str, Any]) -> str:
+        """Send runbook discovery notification."""
+        pass
+    
+    @abstractmethod
+    async def create_approval_thread(self, channel: str, runbook_id: str, context: Dict[str, Any]) -> str:
+        """Create interactive approval thread for runbook execution."""
+        pass
+    
+    @abstractmethod
+    async def update_thread_status(self, thread_id: str, status: str, results: Dict[str, Any]) -> bool:
+        """Update thread with execution status and results."""
+        pass
+    
+    @abstractmethod
+    async def send_completion_summary(self, channel: str, summary: Dict[str, Any]) -> str:
+        """Send workflow completion summary."""
+        pass
+    
+    @abstractmethod
+    async def send_escalation_alert(self, channel: str, incident_id: str, escalation_context: Dict[str, Any]) -> str:
+        """Send escalation alert when runbook execution fails."""
+        pass
+    
+    @abstractmethod
+    async def create_thread(self, channel: str, message: str, formatting: Optional[Any] = None) -> str:
+        """Create new communication thread."""
+        pass
+    
+    @abstractmethod
+    async def send_message(self, thread_id: str, message: str, formatting: Optional[Any] = None) -> str:
+        """Send message to existing thread."""
+        pass
+    
+    async def health_check(self) -> bool:
+        """Default health check implementation."""
+        return True

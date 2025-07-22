@@ -40,11 +40,12 @@ class TestRunbookRepositoryMCPClient:
     
     def test_client_initialization(self, client, mock_config_path):
         """Test client initialization."""
-        assert client.config_path == mock_config_path
+        assert str(client.config_path) == mock_config_path
         assert client.SERVER_NAME == "runbook_repository"
-        assert hasattr(client, '_session')
-        assert hasattr(client, '_read')
-        assert hasattr(client, '_write')
+        assert client.server_name == "runbook_repository"
+        assert hasattr(client, '_config')
+        assert hasattr(client, '_process')
+        assert hasattr(client, '_session_id')
     
     @pytest.mark.asyncio
     async def test_health_check_success(self, client):

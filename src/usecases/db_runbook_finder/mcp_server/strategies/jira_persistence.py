@@ -19,7 +19,7 @@ from ..exceptions import IncidentTrackingError, MCPRunbookError
 logger = logging.getLogger(__name__)
 
 
-class JiraDataStrategy:
+class JiraPersistenceStrategy:
     """
     Jira-based data persistence strategy implementation.
     
@@ -44,7 +44,7 @@ class JiraDataStrategy:
         self._usage_metrics: Dict[str, Dict[str, Any]] = {}
         self._usage_records: Dict[str, Dict[str, Any]] = {}
         
-        logger.info(f"JiraDataStrategy initialized with base_url: {self.base_url}")
+        logger.info(f"JiraPersistenceStrategy initialized with base_url: {self.base_url}")
     
     async def _get_client(self) -> httpx.AsyncClient:
         """Get or create HTTP client for Jira tool API."""
