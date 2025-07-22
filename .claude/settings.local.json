@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "mcp__filesystem__list_directory",
+            "mcp__filesystem__list_directory",
       "mcp__filesystem__read_file",
       "mcp__filesystem__read_multiple_files",
       "mcp__filesystem__directory_tree",
@@ -192,31 +192,5 @@
       "Bash(at:*)",
       "Bash(batch:*)"
     ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": {"tools": ["Edit"]},
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'Editing file: $CLAUDE_FILE_PATHS'"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": {"tools": ["Edit"]},
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_FILE_PATHS\" =~ \\.(ts|tsx|js|jsx)$ ]]; then npx prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || echo 'Prettier not available'; fi"
-          }
-        ]
-      }
-    ]
-  },
-  "includeCoAuthoredBy": true,
-  "cleanupPeriodDays": 30
+  }
 }
