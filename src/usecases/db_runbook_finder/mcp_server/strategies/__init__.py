@@ -1,20 +1,20 @@
 """
 Strategy implementations for the RunbookRepositoryMCP Server.
 
-This package contains all strategy interface protocols and their concrete
+This package contains all Abstract Base Class interfaces and their concrete
 implementations for the quadruple strategy pattern architecture.
 """
 
 from .protocols import (
-    RunbookDiscoveryStrategy,
-    VectorStorageStrategy,
-    DataPersistenceStrategy,
-    NotificationStrategy
+    AbstractDiscoveryStrategy,
+    AbstractVectorStrategy,
+    AbstractPersistenceStrategy,
+    AbstractNotificationStrategy
 )
 
 __all__ = [
-    "RunbookDiscoveryStrategy",
-    "VectorStorageStrategy", 
-    "DataPersistenceStrategy",
-    "NotificationStrategy"
+    "AbstractDiscoveryStrategy",
+    "AbstractVectorStrategy", 
+    "AbstractPersistenceStrategy",
+    "AbstractNotificationStrategy"
 ]

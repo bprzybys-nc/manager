@@ -12,13 +12,13 @@ from datetime import datetime
 import random
 import uuid
 
-from .protocols import NotificationStrategy
+from .protocols import AbstractNotificationStrategy
 from ..exceptions import NotificationError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class MockNotificationStrategy:
+class MockNotificationStrategy(AbstractNotificationStrategy):
     """
     Mock notification strategy implementation.
     
@@ -480,6 +480,223 @@ class MockNotificationStrategy:
         except Exception as e:
             logger.error(f"Mock failed to send alert notification: {e}")
             raise NotificationError(channel, f"Failed to send alert: {e}")
+    
+    async def send_escalation_alert(self, channel: str, incident_id: str, escalation_context: Dict[str, Any]) -> str:
+        """
+        Send mock escalation alert when runbook execution fails or requires human intervention.
+        
+        Args:
+            channel: Communication channel for escalation
+            incident_id: Associated incident
+            escalation_context: Details requiring escalation
+            
+        Returns:
+            Alert message ID
+        """
+        try:
+            # Simulate some processing time
+            await asyncio.sleep(0.01)
+            
+            alert_id = f"escalation_{incident_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{random.randint(1000, 9999)}"
+            
+            # Extract escalation context
+            reason = escalation_context.get("reason", "Mock escalation required")
+            severity = escalation_context.get("severity", "high")
+            runbook_id = escalation_context.get("runbook_id", "unknown")
+            error_details = escalation_context.get("error_details", "Mock execution failure")
+            
+            # Create escalation alert message
+            severity_emoji = {"critical": "🔥", "high": "⚠️", "medium": "⚡", "low": "ℹ️"}.get(severity, "⚠️")
+            
+            mock_message = f"{severity_emoji} **MOCK ESCALATION ALERT**\\n\\n"
+            mock_message += f"**Incident ID:** `{incident_id}`\\n"
+            mock_message += f"**Runbook ID:** `{runbook_id}`\\n"
+            mock_message += f"**Severity:** {severity.upper()}\\n"
+            mock_message += f"**Reason:** {reason}\\n"
+            mock_message += f"**Error Details:** {error_details}\\n"
+            
+            # Add required actions
+            if "required_actions" in escalation_context:
+                actions = escalation_context["required_actions"]
+                if isinstance(actions, list):
+                    mock_message += f"\\n**Required Actions:**\\n"
+                    for i, action in enumerate(actions, 1):
+                        mock_message += f"{i}. {action}\\n"
+            
+            # Add escalation teams
+            if "escalation_teams" in escalation_context:
+                teams = escalation_context["escalation_teams"]
+                if isinstance(teams, list):
+                    teams_str = ", ".join([f"@{team}" for team in teams])
+                    mock_message += f"\\n**Escalation Teams:** {teams_str}\\n"
+            
+            mock_message += f"\\n*Mock escalation alert sent at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC*"
+            
+            # Store escalation alert
+            alert_data = {
+                "alert_id": alert_id,
+                "channel": channel,
+                "channel_name": self._get_mock_channel_name(channel),
+                "incident_id": incident_id,
+                "escalation_context": escalation_context,
+                "message": mock_message,
+                "severity": severity,
+                "sent_at": datetime.utcnow().isoformat(),
+                "status": "sent",
+                "source": "mock"
+            }
+            
+            self._sent_notifications[alert_id] = alert_data
+            
+            logger.warning(f"Mock sent escalation alert {alert_id} for incident {incident_id} to channel {channel}")
+            return alert_id
+            
+        except Exception as e:
+            logger.error(f"Mock failed to send escalation alert: {e}")
+            raise NotificationError(channel, f"Failed to send escalation alert: {e}")
+    
+    async def create_thread(self, channel: str, message: str, formatting: Optional[Any] = None) -> str:
+        """
+        Create new mock communication thread.
+        
+        Args:
+            channel: Communication channel
+            message: Initial message content
+            formatting: Optional formatting (bold, italic, code, etc.)
+            
+        Returns:
+            Thread ID
+        """
+        try:
+            # Simulate some processing time
+            await asyncio.sleep(0.01)
+            
+            thread_id = f"thread_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{random.randint(1000, 9999)}"
+            
+            # Apply mock formatting if specified
+            formatted_message = message
+            if formatting:
+                if isinstance(formatting, dict):
+                    if formatting.get("bold"):
+                        formatted_message = f"**{formatted_message}**"
+                    if formatting.get("italic"):
+                        formatted_message = f"*{formatted_message}*"
+                    if formatting.get("code"):
+                        formatted_message = f"`{formatted_message}`"
+                    if formatting.get("code_block"):
+                        formatted_message = f"```\\n{formatted_message}\\n```"
+            
+            # Create thread data
+            thread_data = {
+                "thread_id": thread_id,
+                "channel": channel,
+                "channel_name": self._get_mock_channel_name(channel),
+                "initial_message": message,
+                "formatted_message": formatted_message,
+                "formatting": formatting,
+                "created_at": datetime.utcnow().isoformat(),
+                "created_by": "mock_user",
+                "status": "active",
+                "message_count": 1,
+                "source": "mock"
+            }
+            
+            self._active_threads[thread_id] = thread_data
+            
+            # Initialize thread messages
+            if thread_id not in self._thread_messages:
+                self._thread_messages[thread_id] = []
+            
+            # Add initial message
+            initial_msg = {
+                "message_id": f"msg_{random.randint(100000, 999999)}",
+                "content": formatted_message,
+                "timestamp": datetime.utcnow().isoformat(),
+                "type": "initial",
+                "author": "mock_user",
+                "formatting": formatting
+            }
+            
+            self._thread_messages[thread_id].append(initial_msg)
+            
+            logger.info(f"Mock created thread {thread_id} in channel {channel}")
+            return thread_id
+            
+        except Exception as e:
+            logger.error(f"Mock failed to create thread: {e}")
+            raise NotificationError(channel, f"Failed to create thread: {e}")
+    
+    async def send_message(self, thread_id: str, message: str, formatting: Optional[Any] = None) -> str:
+        """
+        Send message to existing mock thread.
+        
+        Args:
+            thread_id: Existing thread
+            message: Message content
+            formatting: Optional formatting
+            
+        Returns:
+            Message ID
+        """
+        try:
+            # Simulate some processing time
+            await asyncio.sleep(0.01)
+            
+            message_id = f"msg_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{random.randint(100000, 999999)}"
+            
+            # Check if thread exists
+            if thread_id not in self._active_threads:
+                logger.warning(f"Thread {thread_id} not found, creating mock thread reference")
+                # Create a basic thread reference
+                self._active_threads[thread_id] = {
+                    "thread_id": thread_id,
+                    "channel": "unknown",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "status": "active",
+                    "message_count": 0,
+                    "source": "mock"
+                }
+                self._thread_messages[thread_id] = []
+            
+            # Apply mock formatting if specified
+            formatted_message = message
+            if formatting:
+                if isinstance(formatting, dict):
+                    if formatting.get("bold"):
+                        formatted_message = f"**{formatted_message}**"
+                    if formatting.get("italic"):
+                        formatted_message = f"*{formatted_message}*"
+                    if formatting.get("code"):
+                        formatted_message = f"`{formatted_message}`"
+                    if formatting.get("code_block"):
+                        formatted_message = f"```\\n{formatted_message}\\n```"
+            
+            # Create message data
+            message_data = {
+                "message_id": message_id,
+                "thread_id": thread_id,
+                "content": formatted_message,
+                "original_content": message,
+                "formatting": formatting,
+                "timestamp": datetime.utcnow().isoformat(),
+                "author": "mock_user",
+                "type": "reply",
+                "source": "mock"
+            }
+            
+            # Add to thread messages
+            self._thread_messages[thread_id].append(message_data)
+            
+            # Update thread message count
+            self._active_threads[thread_id]["message_count"] += 1
+            self._active_threads[thread_id]["last_message_at"] = datetime.utcnow().isoformat()
+            
+            logger.info(f"Mock sent message {message_id} to thread {thread_id}")
+            return message_id
+            
+        except Exception as e:
+            logger.error(f"Mock failed to send message: {e}")
+            raise NotificationError(thread_id, f"Failed to send message: {e}")
     
     # Helper Methods
     def _get_mock_channel_name(self, channel: str) -> str:

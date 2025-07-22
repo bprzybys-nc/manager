@@ -11,10 +11,10 @@ from typing import Dict, Any, Optional, Union
 from enum import Enum
 
 from .strategies.protocols import (
-    RunbookDiscoveryStrategy,
-    VectorStorageStrategy,
-    DataPersistenceStrategy,
-    NotificationStrategy
+    AbstractDiscoveryStrategy,
+    AbstractVectorStrategy,
+    AbstractPersistenceStrategy,
+    AbstractNotificationStrategy
 )
 
 # Real implementations
@@ -97,7 +97,7 @@ class StrategyFactory:
         
         logger.info(f"StrategyFactory initialized for {self.config.environment} environment")
     
-    async def create_discovery_strategy(self) -> RunbookDiscoveryStrategy:
+    async def create_discovery_strategy(self) -> AbstractDiscoveryStrategy:
         """
         Create runbook discovery strategy with graceful degradation.
         
@@ -154,7 +154,7 @@ class StrategyFactory:
                 timeout=self.config.timeout
             )
     
-    async def create_vector_strategy(self) -> VectorStorageStrategy:
+    async def create_vector_strategy(self) -> AbstractVectorStrategy:
         """
         Create vector storage strategy with graceful degradation.
         
@@ -209,7 +209,7 @@ class StrategyFactory:
                 timeout=self.config.timeout
             )
     
-    async def create_persistence_strategy(self) -> DataPersistenceStrategy:
+    async def create_persistence_strategy(self) -> AbstractPersistenceStrategy:
         """
         Create data persistence strategy with graceful degradation.
         
@@ -242,9 +242,9 @@ class StrategyFactory:
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
-                    from .strategies.mock_persistence import MockDataStrategy
-                    strategy = MockDataStrategy()
-                    logger.info(f"Created MOCK persistence strategy: MockDataStrategy")
+                    from .strategies.mock_persistence import MockPersistenceStrategy
+                    strategy = MockPersistenceStrategy()
+                    logger.info(f"Created MOCK persistence strategy: MockPersistenceStrategy")
                     return strategy
                     
             except Exception as e:
@@ -253,9 +253,9 @@ class StrategyFactory:
         
         # Fallback to mock
         try:
-            from .strategies.mock_persistence import MockDataStrategy
-            strategy = MockDataStrategy()
-            logger.warning("All persistence strategies failed, falling back to MockDataStrategy")
+            from .strategies.mock_persistence import MockPersistenceStrategy
+            strategy = MockPersistenceStrategy()
+            logger.warning("All persistence strategies failed, falling back to MockPersistenceStrategy")
             return strategy
         except ImportError:
             logger.error("Mock strategy not available, using basic JiraPersistenceStrategy")
@@ -264,7 +264,7 @@ class StrategyFactory:
                 timeout=self.config.timeout
             )
     
-    async def create_notification_strategy(self) -> NotificationStrategy:
+    async def create_notification_strategy(self) -> AbstractNotificationStrategy:
         """
         Create notification strategy with graceful degradation.
         

@@ -13,13 +13,13 @@ import os
 from datetime import datetime
 import json
 
-from .protocols import NotificationStrategy
+from .protocols import AbstractNotificationStrategy
 from ..exceptions import NotificationError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class SlackNotificationStrategy:
+class SlackNotificationStrategy(AbstractNotificationStrategy):
     """
     Slack-based notification strategy implementation.
     

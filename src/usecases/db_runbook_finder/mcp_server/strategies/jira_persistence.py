@@ -13,13 +13,13 @@ import os
 from datetime import datetime
 import json
 
-from .protocols import DataPersistenceStrategy
+from .protocols import AbstractPersistenceStrategy
 from ..exceptions import IncidentTrackingError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class JiraPersistenceStrategy:
+class JiraPersistenceStrategy(AbstractPersistenceStrategy):
     """
     Jira-based data persistence strategy implementation.
     
