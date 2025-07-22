@@ -13,10 +13,10 @@ import uuid
 import time
 
 from .strategies.protocols import (
-    AbstractDiscoveryStrategy,
-    AbstractVectorStrategy, 
-    AbstractPersistenceStrategy,
-    AbstractNotificationStrategy
+    RunbookDiscoveryStrategyABC,
+    DBVectorStrategyABC,
+    PersistenceStrategyABC,
+    NotificationStrategyABC
 )
 from .exceptions import (
     MCPRunbookError,
@@ -39,11 +39,11 @@ class RunbookRepositoryMCPServer:
     data persistence, and notification strategies.
     """
     
-    def __init__(self, 
-                 discovery_strategy: AbstractDiscoveryStrategy,
-                 vector_strategy: AbstractVectorStrategy,
-                 persistence_strategy: AbstractPersistenceStrategy,
-                 notification_strategy: AbstractNotificationStrategy):
+    def __init__(self,
+                 discovery_strategy: RunbookDiscoveryStrategyABC,
+                 vector_strategy: DBVectorStrategyABC,
+                 persistence_strategy: PersistenceStrategyABC,
+                 notification_strategy: NotificationStrategyABC):
         """
         Initialize MCP server with strategy implementations.
         

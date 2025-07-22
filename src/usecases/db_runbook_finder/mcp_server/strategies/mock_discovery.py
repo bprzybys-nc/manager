@@ -12,13 +12,13 @@ from datetime import datetime
 import random
 from pathlib import Path
 
-from .protocols import AbstractDiscoveryStrategy
+from .protocols import RunbookDiscoveryStrategyABC
 from ..exceptions import MCPRunbookError, RunbookNotFoundError
 
 logger = logging.getLogger(__name__)
 
 
-class MockDiscoveryStrategy(AbstractDiscoveryStrategy):
+class MockDiscoveryStrategy(RunbookDiscoveryStrategyABC):
     """
     Mock runbook discovery strategy implementation.
     

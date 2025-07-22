@@ -13,13 +13,13 @@ import random
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from .protocols import AbstractVectorStrategy
+from .protocols import DBVectorStrategyABC
 from ..exceptions import MCPRunbookError, VectorSearchError
 
 logger = logging.getLogger(__name__)
 
 
-class MockVectorStrategy(AbstractVectorStrategy):
+class MockDBVectorStrategy(DBVectorStrategyABC):
     """
     Mock vector storage strategy implementation.
     

@@ -13,13 +13,13 @@ import os
 from datetime import datetime
 import time
 
-from .protocols import AbstractVectorStrategy
+from .protocols import DBVectorStrategyABC
 from ..exceptions import VectorSearchError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class ChromaDBVectorStrategy(AbstractVectorStrategy):
+class ChromaDBVectorStrategy(DBVectorStrategyABC):
     """
     ChromaDB-based vector storage strategy implementation.
     

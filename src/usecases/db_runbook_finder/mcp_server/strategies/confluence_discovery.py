@@ -12,13 +12,13 @@ import httpx
 import os
 from datetime import datetime
 
-from .protocols import AbstractDiscoveryStrategy
+from .protocols import RunbookDiscoveryStrategyABC
 from ..exceptions import MCPRunbookError, RunbookNotFoundError
 
 logger = logging.getLogger(__name__)
 
 
-class ConfluenceRunbookStrategy(AbstractDiscoveryStrategy):
+class ConfluenceRunbookDiscoveryStrategy(RunbookDiscoveryStrategyABC):
     """
     Confluence-based runbook discovery strategy implementation.
     

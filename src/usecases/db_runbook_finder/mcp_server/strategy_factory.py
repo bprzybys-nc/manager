@@ -11,14 +11,14 @@ from typing import Dict, Any, Optional, Union
 from enum import Enum
 
 from .strategies.protocols import (
-    AbstractDiscoveryStrategy,
-    AbstractVectorStrategy,
-    AbstractPersistenceStrategy,
-    AbstractNotificationStrategy
+    RunbookDiscoveryStrategyABC,
+    DBVectorStrategyABC,
+    PersistenceStrategyABC,
+    NotificationStrategyABC
 )
 
 # Real implementations
-from .strategies.confluence_discovery import ConfluenceRunbookStrategy
+from .strategies.confluence_discovery import ConfluenceRunbookDiscoveryStrategy
 from .strategies.chromadb_vector import ChromaDBVectorStrategy
 from .strategies.jira_persistence import JiraPersistenceStrategy
 from .strategies.slack_notification import SlackNotificationStrategy
@@ -97,7 +97,7 @@ class StrategyFactory:
         
         logger.info(f"StrategyFactory initialized for {self.config.environment} environment")
     
-    async def create_discovery_strategy(self) -> AbstractDiscoveryStrategy:
+    async def create_discovery_strategy(self) -> RunbookDiscoveryStrategyABC:
         """
         Create runbook discovery strategy with graceful degradation.
         
@@ -110,7 +110,7 @@ class StrategyFactory:
             try:
                 if tier == ImplementationTier.REAL:
                     if await self._check_service_availability("confluence", self.config.confluence_url):
-                        strategy = ConfluenceRunbookStrategy(
+                        strategy = ConfluenceRunbookDiscoveryStrategy(
                             base_url=self.config.confluence_url,
                             timeout=self.config.timeout
                         )
@@ -123,7 +123,7 @@ class StrategyFactory:
                 elif tier == ImplementationTier.WORKING:
                     # Working implementation would be a simplified Confluence strategy
                     # or a hybrid approach with cached data
-                    strategy = ConfluenceRunbookStrategy(
+                    strategy = ConfluenceRunbookDiscoveryStrategy(
                         base_url=self.config.confluence_url,
                         timeout=self.config.timeout
                     )
@@ -149,12 +149,12 @@ class StrategyFactory:
             return strategy
         except ImportError:
             logger.error("Mock strategy not available, using basic ConfluenceRunbookStrategy")
-            return ConfluenceRunbookStrategy(
+            return ConfluenceRunbookDiscoveryStrategy(
                 base_url=self.config.confluence_url,
                 timeout=self.config.timeout
             )
     
-    async def create_vector_strategy(self) -> AbstractVectorStrategy:
+    async def create_vector_strategy(self) -> DBVectorStrategyABC:
         """
         Create vector storage strategy with graceful degradation.
         
@@ -187,8 +187,8 @@ class StrategyFactory:
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
-                    from .strategies.mock_vector import MockVectorStrategy
-                    strategy = MockVectorStrategy()
+                    from .strategies.mock_vector import MockDBVectorStrategy
+                    strategy = MockDBVectorStrategy()
                     logger.info(f"Created MOCK vector strategy: MockVectorStrategy")
                     return strategy
                     
@@ -198,8 +198,8 @@ class StrategyFactory:
         
         # Fallback to mock
         try:
-            from .strategies.mock_vector import MockVectorStrategy
-            strategy = MockVectorStrategy()
+            from .strategies.mock_vector import MockDBVectorStrategy
+            strategy = MockDBVectorStrategy()
             logger.warning("All vector strategies failed, falling back to MockVectorStrategy")
             return strategy
         except ImportError:
@@ -209,7 +209,7 @@ class StrategyFactory:
                 timeout=self.config.timeout
             )
     
-    async def create_persistence_strategy(self) -> AbstractPersistenceStrategy:
+    async def create_persistence_strategy(self) -> PersistenceStrategyABC:
         """
         Create data persistence strategy with graceful degradation.
         
@@ -264,7 +264,7 @@ class StrategyFactory:
                 timeout=self.config.timeout
             )
     
-    async def create_notification_strategy(self) -> AbstractNotificationStrategy:
+    async def create_notification_strategy(self) -> NotificationStrategyABC:
         """
         Create notification strategy with graceful degradation.
         

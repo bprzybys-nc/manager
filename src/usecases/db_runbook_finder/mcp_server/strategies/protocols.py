@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 # Abstract Base Classes with formal interface validation
 # Following Python 2025 ABC best practices: formal interfaces with validation and error handling
 
-class AbstractDiscoveryStrategy(ABC):
+class RunbookDiscoveryStrategyABC(ABC):
     """
     Abstract base class implementing RunbookDiscoveryStrategy protocol.
     
@@ -100,7 +100,7 @@ class AbstractDiscoveryStrategy(ABC):
         return True
 
 
-class AbstractVectorStrategy(ABC):
+class DBVectorStrategyABC(ABC):
     """
     Abstract base class implementing VectorStorageStrategy protocol.
     
@@ -167,7 +167,7 @@ class AbstractVectorStrategy(ABC):
         return True
 
 
-class AbstractPersistenceStrategy(ABC):
+class PersistenceStrategyABC(ABC):
     """
     Abstract base class implementing DataPersistenceStrategy protocol.
     
@@ -235,7 +235,7 @@ class AbstractPersistenceStrategy(ABC):
         return True
 
 
-class AbstractNotificationStrategy(ABC):
+class NotificationStrategyABC(ABC):
     """
     Abstract base class implementing NotificationStrategy protocol.
     

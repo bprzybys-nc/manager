@@ -11,7 +11,7 @@ import numpy as np
 from datetime import datetime
 from unittest.mock import Mock, patch
 
-from src.usecases.db_runbook_finder.mcp_server.strategies.mock_vector import MockVectorStrategy
+from src.usecases.db_runbook_finder.mcp_server.strategies.mock_vector import MockDBVectorStrategy
 from src.usecases.db_runbook_finder.mcp_server.exceptions import VectorSearchError, RunbookNotFoundError
 
 
@@ -21,7 +21,7 @@ class TestMockVectorStrategy:
     @pytest.fixture
     def mock_strategy(self):
         """Create mock vector strategy instance."""
-        return MockVectorStrategy()
+        return MockDBVectorStrategy()
     
     @pytest.mark.asyncio
     async def test_health_check_always_returns_true(self, mock_strategy):

@@ -12,13 +12,13 @@ from datetime import datetime
 import random
 import uuid
 
-from .protocols import AbstractNotificationStrategy
+from .protocols import NotificationStrategyABC
 from ..exceptions import NotificationError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class MockNotificationStrategy(AbstractNotificationStrategy):
+class MockNotificationStrategy(NotificationStrategyABC):
     """
     Mock notification strategy implementation.
     

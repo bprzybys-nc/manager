@@ -6,15 +6,15 @@ implementations for the quadruple strategy pattern architecture.
 """
 
 from .protocols import (
-    AbstractDiscoveryStrategy,
-    AbstractVectorStrategy,
-    AbstractPersistenceStrategy,
-    AbstractNotificationStrategy
+    RunbookDiscoveryStrategyABC,
+    DBVectorStrategyABC,
+    PersistenceStrategyABC,
+    NotificationStrategyABC
 )
 
 __all__ = [
-    "AbstractDiscoveryStrategy",
-    "AbstractVectorStrategy", 
-    "AbstractPersistenceStrategy",
-    "AbstractNotificationStrategy"
+    "RunbookDiscoveryStrategyABC",
+    "DBVectorStrategyABC",
+    "PersistenceStrategyABC",
+    "NotificationStrategyABC"
 ]

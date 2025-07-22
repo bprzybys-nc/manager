@@ -12,13 +12,13 @@ from datetime import datetime, timedelta
 import random
 import uuid
 
-from .protocols import AbstractPersistenceStrategy
+from .protocols import PersistenceStrategyABC
 from ..exceptions import IncidentTrackingError, MCPRunbookError
 
 logger = logging.getLogger(__name__)
 
 
-class MockPersistenceStrategy(AbstractPersistenceStrategy):
+class MockPersistenceStrategy(PersistenceStrategyABC):
     """
     Mock data persistence strategy implementation.
     
