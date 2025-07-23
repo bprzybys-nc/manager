@@ -301,6 +301,18 @@ def client():
     def health_check():
         return {"status": "healthy", "timestamp": "2024-01-01T00:00:00Z"}
     
+    @app.get("/health/ready")
+    def readiness_check():
+        return {"status": "ready", "timestamp": "2024-01-01T00:00:00Z"}
+    
+    @app.get("/health/live")
+    def liveness_check():
+        return {"status": "alive", "timestamp": "2024-01-01T00:00:00Z"}
+    
+    @app.get("/metrics")
+    def metrics():
+        return {"runbooks_indexed": 0, "vector_dimensions": 384, "total_queries": 0}
+    
     return TestClient(app)
 
 

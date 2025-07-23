@@ -128,7 +128,7 @@ def check_environment_variables():
         print("\\n⚠ Missing environment variables - some tests may use mock data")
 
 
-def test_health_endpoints(client) -> List:
+def test_health_endpoints(client):
     """Test all health and system status endpoints."""
     print("\\n" + "="*70)
     print("TESTING HEALTH AND SYSTEM STATUS ENDPOINTS")
@@ -225,10 +225,12 @@ def test_health_endpoints(client) -> List:
         print(f"✗ Exception during metrics retrieval: {str(e)}")
         results.append(("Metrics endpoint", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_runbook_management(client, data_loader) -> List:
+def test_runbook_management(client, data_loader):
     """Test runbook CRUD operations."""
     print("\\n" + "="*70)
     print("TESTING RUNBOOK MANAGEMENT ENDPOINTS")
@@ -315,10 +317,12 @@ def test_runbook_management(client, data_loader) -> List:
             print(f"⚠ Exception during extraction (expected): {str(e)}")
             results.append(("Extract runbook", True, "Exception expected without Confluence"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_search_endpoints(client, data_loader) -> List:
+def test_search_endpoints(client, data_loader):
     """Test search endpoints (semantic and Confluence)."""
     print("\\n" + "="*70)
     print("TESTING SEARCH ENDPOINTS")
@@ -384,10 +388,12 @@ def test_search_endpoints(client, data_loader) -> List:
         print(f"✗ Exception during Confluence search: {str(e)}")
         results.append(("Confluence search", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_bulk_operations(client, data_loader) -> List:
+def test_bulk_operations(client, data_loader):
     """Test bulk operations and job management."""
     print("\\n" + "="*70)
     print("TESTING BULK OPERATIONS AND JOB MANAGEMENT")
@@ -468,10 +474,12 @@ def test_bulk_operations(client, data_loader) -> List:
         print(f"✗ Exception during job management testing: {str(e)}")
         results.append(("Job management", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_error_handling(client, data_loader) -> List:
+def test_error_handling(client, data_loader):
     """Test error handling and validation."""
     print("\\n" + "="*70)
     print("TESTING ERROR HANDLING AND VALIDATION")
@@ -514,10 +522,12 @@ def test_error_handling(client, data_loader) -> List:
             print(f"✗ Exception during {description}: {str(e)}")
             results.append((f"Error handling: {description}", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_performance_scenarios(client, data_loader) -> List:
+def test_performance_scenarios(client, data_loader):
     """Test performance scenarios."""
     print("\\n" + "="*70)
     print("TESTING PERFORMANCE SCENARIOS")
@@ -562,10 +572,12 @@ def test_performance_scenarios(client, data_loader) -> List:
         print(f"✗ Exception during performance testing: {str(e)}")
         results.append(("Search performance", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
-def test_data_persistence(client, data_loader) -> List:
+def test_data_persistence(client, data_loader):
     """Test data persistence and vector store operations."""
     print("\\n" + "="*70)
     print("TESTING DATA PERSISTENCE")
@@ -598,7 +610,9 @@ def test_data_persistence(client, data_loader) -> List:
         print(f"✗ Exception during data persistence test: {str(e)}")
         results.append(("Data persistence", False, f"Exception: {str(e)}"))
     
-    return results
+    # Assert overall success
+    failed_tests = [test for test in results if not test[1]]
+    assert len(failed_tests) == 0, f"Failed tests: {[test[0] for test in failed_tests]}"
 
 
 def print_test_summary(test_results: List):
