@@ -1,0 +1,7 @@
+# Claude Code ignore patterns for Manager component
+
+# Exclude archived MCP server implementation from analysis
+src/usecases/db_runbook_finder/mcp_server_archived/
+
+# This directory contains archived code that was removed during architecture
+# simplification and should not be considered for modifications or analysis
