@@ -57,6 +57,29 @@ class JiraClient:
             "comments": comments
         }
 
+    def get_ticket(self, ticket_id: str) -> dict:
+        """
+        Retrieves full ticket data matching standard Jira API structure.
+        
+        :param ticket_id: The ID of the Jira issue (e.g., 'PROJ-123').
+        :return: A dictionary with 'fields' containing full ticket data.
+        """
+        issue = self.client.issue(ticket_id)
+        
+        return {
+            "fields": {
+                "summary": issue.fields.summary,
+                "description": issue.fields.description,
+                "project": {"key": issue.fields.project.key},
+                "issuetype": {"name": issue.fields.issuetype.name},
+                "priority": {"name": issue.fields.priority.name if issue.fields.priority else "None"},
+                "assignee": {"displayName": issue.fields.assignee.displayName if issue.fields.assignee else "Unassigned"},
+                "status": {"name": issue.fields.status.name},
+                "created": issue.fields.created,
+                "labels": issue.fields.labels if issue.fields.labels else []
+            }
+        }
+
     def _format_comment(self,message: str, formatting: JiraFormatting) -> str:
         if formatting is None:
             return message

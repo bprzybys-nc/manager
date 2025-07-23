@@ -59,7 +59,7 @@ class ConfluenceClient:
     def _make_request(self, method: str, endpoint: str, params: Optional[Dict] = None, 
                      data: Optional[Dict] = None) -> Dict[str, Any]:
         """Make HTTP request to Confluence API with error handling and retries."""
-        url = f"{self.base_url}/rest/api{endpoint}"
+        url = f"{self.base_url}/wiki/rest/api{endpoint}"
         
         try:
             logger.debug(

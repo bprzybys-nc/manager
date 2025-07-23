@@ -90,7 +90,7 @@ class DBRunbookFinderNodes:
             if self.use_real_tools and self.jira_configured:
                 from src.tools.jira.app.jira import JiraClient
                 jira_client = JiraClient()
-                response = await jira_client.get_ticket(state.jira_key)
+                response = jira_client.get_ticket(state.jira_key)
                 jira_data = response  # Real API response
             else:
                 # Mock implementation for development/testing
@@ -245,15 +245,15 @@ class DBRunbookFinderNodes:
             
             comment_text = "\n".join(comment_lines)
             
-            # Direct tool integration point (future enhancement)
-            # TODO: Implement direct Jira tool integration when available
-            # if self.use_real_tools and self.jira_configured:
-            #     from src.tools.jira.app.jira import JiraClient
-            #     jira_client = JiraClient()
-            #     await jira_client.add_comment(state.jira_key, comment_text)
-            
-            # Mock comment addition
-            self.logger.log_info(f"Mock: Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
+            # Direct tool integration point
+            if self.use_real_tools and self.jira_configured:
+                from src.tools.jira.app.jira import JiraClient
+                jira_client = JiraClient()
+                jira_client.add_comment(state.jira_key, comment_text)
+                self.logger.log_info(f"Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
+            else:
+                # Mock comment addition
+                self.logger.log_info(f"Mock: Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
             self.logger.log_debug(f"Comment content preview: {comment_text[:100]}...")
             
             duration = time.time() - start_time
@@ -325,15 +325,15 @@ class DBRunbookFinderNodes:
             
             comment_text = "\n".join(gap_comment)
             
-            # Direct tool integration point (future enhancement)
-            # TODO: Implement direct Jira tool integration when available
-            # if self.use_real_tools and self.jira_configured:
-            #     from src.tools.jira.app.jira import JiraClient
-            #     jira_client = JiraClient()
-            #     await jira_client.add_comment(state.jira_key, comment_text)
-            
-            # Mock comment addition
-            self.logger.log_info(f"Mock: Added gap comment to {state.jira_key}")
+            # Direct tool integration point
+            if self.use_real_tools and self.jira_configured:
+                from src.tools.jira.app.jira import JiraClient
+                jira_client = JiraClient()
+                jira_client.add_comment(state.jira_key, comment_text)
+                self.logger.log_info(f"Added gap comment to {state.jira_key}")
+            else:
+                # Mock comment addition
+                self.logger.log_info(f"Mock: Added gap comment to {state.jira_key}")
             self.logger.log_debug(f"Gap comment content preview: {comment_text[:100]}...")
             
             duration = time.time() - start_time

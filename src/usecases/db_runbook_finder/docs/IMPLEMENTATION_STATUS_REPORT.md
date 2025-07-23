@@ -11,8 +11,8 @@
 |------|----------|------|--------|-------------|
 | 📥 **fetch_incident** | ✅ Jira | ✅ Complete | 🟢 **READY** | Test real integration |
 | 🔎 **search_runbooks** | ✅ Confluence | ✅ Complete | 🟢 **READY** | Test real integration |
-| 📝 **update_jira_results** | 🚧 TODO | ✅ Complete | 🟡 **MOCK** | Uncomment lines 249-253 |
-| ⚠️ **terminate_gap** | 🚧 TODO | ✅ Complete | 🟡 **MOCK** | Uncomment lines 329-333 |
+| 📝 **update_jira_results** | ✅ Jira | ✅ Complete | 🟢 **READY** | Test real integration |
+| ⚠️ **terminate_gap** | ✅ Jira | ✅ Complete | 🟢 **READY** | Test real integration |
 | 📢 **notify_team** | 🚧 TODO | ✅ Complete | 🟡 **MOCK** | Uncomment lines 427-431 |
 
 ## Node Steps Implementation Details
@@ -28,11 +28,11 @@
 | 🔎 | Result Processing | ✅ Response parsing | ✅ Response parsing | 🟢 **Same logic** |
 | 🔎 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
 | 📝 | Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | 🟢 **Same logic** |
-| 📝 | Jira Comment Addition | 🚧 TODO (lines 249-253) | ✅ Mock logging | 🟡 **Mock** (real TODO) |
+| 📝 | Jira Comment Addition | ✅ `JiraClient.add_comment()` | ✅ Mock logging | 🟢 **Real** (if configured) |
 | 📝 | Success Status Update | ✅ `state.update_status("SUCCESS")` | ✅ `state.update_status("SUCCESS")` | 🟢 **Same logic** |
 | 📝 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
 | ⚠️ | Gap Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | 🟢 **Same logic** |
-| ⚠️ | Jira Comment Addition | 🚧 TODO (lines 329-333) | ✅ Mock logging | 🟡 **Mock** (real TODO) |
+| ⚠️ | Jira Comment Addition | ✅ `JiraClient.add_comment()` | ✅ Mock logging | 🟢 **Real** (if configured) |
 | ⚠️ | Gap Status Update | ✅ `state.update_status("GAP_DETECTED")` | ✅ `state.update_status("GAP_DETECTED")` | 🟢 **Same logic** |
 | ⚠️ | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
 | 📢 | Message Formatting | ✅ Status-based templating | ✅ Status-based templating | 🟢 **Same logic** |
