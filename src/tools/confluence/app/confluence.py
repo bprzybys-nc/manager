@@ -265,6 +265,36 @@ class ConfluenceClient:
         except ConfluenceAPIError:
             raise
     
+    def get_page_children(self, page_id: str) -> List[Dict[str, Any]]:
+        """
+        Get child pages of a Confluence page.
+        
+        Args:
+            page_id: The ID of the parent page
+            
+        Returns:
+            List of child page dictionaries
+            
+        Raises:
+            ConfluenceAPIError: If page not found or API error occurs
+        """
+        if not page_id or not page_id.strip():
+            raise ValueError("Page ID cannot be empty")
+        
+        endpoint = f"/content/{page_id}/child/page"
+        params = {
+            'expand': 'space,version',
+            'limit': 200  # Get more children if needed
+        }
+        
+        try:
+            response = self._make_request('GET', endpoint, params=params)
+            return response.get('results', [])
+        except ConfluenceAPIError as e:
+            if e.status_code == 404:
+                raise ConfluenceAPIError(f"Page with ID '{page_id}' not found", status_code=404)
+            raise
+    
     def _clean_html_content(self, html: str) -> str:
         """
         Clean and sanitize HTML content, extracting plain text.

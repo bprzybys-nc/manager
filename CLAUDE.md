@@ -242,4 +242,7 @@ When working directly in your terminal, activate the environment to ensure all c
 -   **Simplicity**: Prevents a complex web of conflicting, nested virtual environments.
 -   **Maintainability**: A single `pyproject.toml` file makes dependency updates and audits straightforward.
 -   **Robust Tooling**: Aligns with the idiomatic usage of `uv`, making our `Makefile` and automation scripts cleaner and more reliable.
-```
+
+## .env Configuration
+
+- `.env` is located at the project root level

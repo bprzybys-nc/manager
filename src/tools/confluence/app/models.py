@@ -314,3 +314,29 @@ class RunbookUpdateRequest(BaseModel):
                 raise ValueError('Raw content cannot exceed 1MB')
             return v.strip()
         return v
+
+
+class DiscoveryResult(BaseModel):
+    """Result of runbook discovery operation."""
+    
+    total_discovered: int = Field(..., ge=0, description="Total number of runbooks discovered")
+    successful_discoveries: int = Field(..., ge=0, description="Number of successful discoveries")
+    failed_discoveries: int = Field(..., ge=0, description="Number of failed discoveries")
+    processing_time: float = Field(..., ge=0, description="Total processing time in seconds")
+    root_urls: List[str] = Field(..., description="Root URLs that were scanned")
+    discovered_runbooks: List[RunbookContent] = Field(default_factory=list, description="Discovered runbook content")
+    errors: List[str] = Field(default_factory=list, description="Discovery error messages")
+    client_stats: Dict[str, int] = Field(default_factory=dict, description="Per-client discovery statistics")
+
+
+class PopulationResult(BaseModel):
+    """Result of ChromaDB population operation."""
+    
+    total_runbooks: int = Field(..., ge=0, description="Total number of runbooks to populate")
+    successful_populations: int = Field(..., ge=0, description="Number of successful populations")
+    failed_populations: int = Field(..., ge=0, description="Number of failed populations")
+    processing_time: float = Field(..., ge=0, description="Total processing time in seconds")
+    collection_name: str = Field(..., description="ChromaDB collection name")
+    populated_runbook_ids: List[str] = Field(default_factory=list, description="IDs of successfully populated runbooks")
+    errors: List[str] = Field(default_factory=list, description="Population error messages")
+    deduplication_stats: Dict[str, int] = Field(default_factory=dict, description="Deduplication statistics")
