@@ -96,6 +96,7 @@ SysAIdmin (Ovora) is an AI-powered system administration platform with three mai
 
 - **Python Logic Tests**: py logic tests are ran from project's root dir using .venv/bin/python
 - **Keep Workflows' Tests**: keep workflowss' tests in their dir tests dir
+- **Py Logic**: Must be ran from project root using uv run python
 
 ### DB Runbook Finder Workflow - Production-Ready Implementation
 
@@ -241,3 +242,4 @@ When working directly in your terminal, activate the environment to ensure all c
 -   **Simplicity**: Prevents a complex web of conflicting, nested virtual environments.
 -   **Maintainability**: A single `pyproject.toml` file makes dependency updates and audits straightforward.
 -   **Robust Tooling**: Aligns with the idiomatic usage of `uv`, making our `Makefile` and automation scripts cleaner and more reliable.
+```

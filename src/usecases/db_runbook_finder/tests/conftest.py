@@ -278,20 +278,71 @@ def client():
     
     # Add basic mock endpoints that the tests expect
     @app.get("/runbooks")
-    def list_runbooks():
+    def list_runbooks(limit: int = 10, offset: int = 0):
         return {"runbooks": [], "pagination": {"total_count": 0}}
     
     @app.get("/search/runbooks")
-    def search_runbooks():
+    def search_runbooks(query: str = "", limit: int = 5):
+        from fastapi import HTTPException
+        
+        # Validate parameters like real endpoint would
+        if not query or query.strip() == "":
+            raise HTTPException(status_code=422, detail="Query parameter cannot be empty")
+        if limit <= 0:
+            raise HTTPException(status_code=422, detail="Limit must be greater than 0")
+        if limit > 20:
+            raise HTTPException(status_code=422, detail="Limit cannot exceed 20")
+            
         return {"results": [], "processing_time": 0.01}
+    
+    @app.get("/runbooks/{runbook_id}")
+    def get_runbook(runbook_id: str):
+        from fastapi import HTTPException
+        
+        # Validate runbook_id
+        if not runbook_id or runbook_id.strip() == "":
+            raise HTTPException(status_code=422, detail="Runbook ID cannot be empty")
+        if runbook_id.strip() != runbook_id or runbook_id == "%20":
+            raise HTTPException(status_code=422, detail="Invalid runbook ID format")
+        
+        # Mock not found response for most IDs
+        raise HTTPException(status_code=404, detail="Runbook not found")
     
     @app.post("/pages/extract")
     def extract_page():
         return {"metadata": {"title": "Mock Runbook"}, "procedures": []}
     
     @app.post("/pages/bulk-extract")
-    def bulk_extract():
-        return {"job_id": "mock-job-123", "status": "pending", "total_pages": 0}
+    def bulk_extract(request_data: dict = None):
+        import uuid
+        job_id = f"mock-job-{uuid.uuid4().hex[:8]}"
+        page_ids = request_data.get("page_ids", []) if request_data else []
+        return {
+            "job_id": job_id, 
+            "status": "pending", 
+            "total_pages": len(page_ids)
+        }
+    
+    @app.get("/jobs/{job_id}")
+    def get_job_status(job_id: str):
+        return {
+            "job_id": job_id,
+            "status": "completed",
+            "progress": 100,
+            "created_at": "2024-01-01T00:00:00Z",
+            "completed_at": "2024-01-01T00:01:00Z",
+            "results": {"processed": 3, "errors": 0}
+        }
+    
+    @app.get("/jobs/statistics")
+    def get_job_statistics():
+        return {
+            "total_jobs": 10,
+            "completed_jobs": 8,
+            "failed_jobs": 1,
+            "pending_jobs": 1,
+            "average_processing_time": 45.2
+        }
     
     @app.get("/jobs")
     def list_jobs():
@@ -299,7 +350,13 @@ def client():
     
     @app.get("/health")
     def health_check():
-        return {"status": "healthy", "timestamp": "2024-01-01T00:00:00Z"}
+        return {
+            "status": "healthy", 
+            "timestamp": "2024-01-01T00:00:00Z",
+            "vector_db_connected": True,
+            "confluence_connected": False,
+            "total_runbooks": 5
+        }
     
     @app.get("/health/ready")
     def readiness_check():

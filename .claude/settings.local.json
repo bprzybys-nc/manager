@@ -189,7 +189,10 @@
       "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_workflow.py::TestDBRunbookFinderWorkflow::test_workflow_with_agent_6_ticket -v --tb=short --timeout=30)",
       "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_comprehensive_chromadb_endpoints.py::test_health_endpoints -v --tb=short)",
       "Bash(python -m pytest src/usecases/db_runbook_finder/tests/ -v --tb=no -q)",
-      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -q)"
+      "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -q)",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__read_file",
+      "Bash(touch:*)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",
