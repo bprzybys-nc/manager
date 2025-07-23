@@ -7,8 +7,7 @@ the DB Runbook Finder test suite.
 
 import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock
-from typing import Dict, Any, List
+from unittest.mock import Mock
 
 from src.usecases.db_runbook_finder.state import WorkflowState
 from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
@@ -118,14 +117,6 @@ def mock_confluence_response():
 def mock_confluence_empty_response():
     """Mock empty Confluence search response for gap testing."""
     return {"results": []}
-
-
-@pytest.fixture
-def mock_mcp_client():
-    """Mock MCP client for testing."""
-    client = AsyncMock()
-    client.call_tool = AsyncMock()
-    return client
 
 
 @pytest.fixture

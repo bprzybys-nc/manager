@@ -194,7 +194,12 @@
       "mcp__filesystem__read_file",
       "Bash(touch:*)",
       "mcp__jetbrains__list_files_in_folder",
-      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest *)"
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest *)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_nodes.py -v --timeout=30)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_comprehensive_chromadb_endpoints.py -v --timeout=30 -x)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -v --timeout=30 --ignore=src/usecases/db_runbook_finder/tests/test_workflow.py -x)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -m performance --timeout=30)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -v --ignore=src/usecases/db_runbook_finder/tests/test_workflow.py --timeout=30)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

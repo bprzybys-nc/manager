@@ -10,10 +10,9 @@ import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import random
-import uuid
 
 from .protocols import NotificationStrategyABC
-from ..exceptions import NotificationError, MCPRunbookError
+from ..exceptions import NotificationError
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class MockNotificationStrategy(NotificationStrategyABC):
             "alerts": "C4567890123"
         }
         
-        logger.info(f"MockNotificationStrategy initialized")
+        logger.info("MockNotificationStrategy initialized")
     
     async def health_check(self) -> bool:
         """
@@ -175,13 +174,13 @@ class MockNotificationStrategy(NotificationStrategyABC):
                 approvers_str = ", ".join([f"@{approver}" for approver in approvers])
                 mock_message += f"**Approvers:** {approvers_str}\\n"
             
-            mock_message += f"\\n**Mock Details:**\\n"
+            mock_message += "\\n**Mock Details:**\\n"
             if "description" in context:
                 mock_message += f"{context['description']}\\n"
             if "estimated_duration" in context:
                 mock_message += f"Estimated Duration: {context['estimated_duration']}\\n"
             if "rollback_procedure" in context:
-                mock_message += f"Rollback Available: Yes\\n"
+                mock_message += "Rollback Available: Yes\\n"
             
             mock_message += f"\\n*Mock approval requested at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC*"
             
@@ -359,7 +358,7 @@ class MockNotificationStrategy(NotificationStrategyABC):
                 status_emoji = "⚠️"
                 
             mock_message = f"{status_emoji} **MOCK WORKFLOW COMPLETED: {workflow_name}**\\n\\n"
-            mock_message += f"**Mock Summary:**\\n"
+            mock_message += "**Mock Summary:**\\n"
             mock_message += f"• Total Runbooks: {total_runbooks}\\n"
             mock_message += f"• Successful: {successful_executions}\\n"
             mock_message += f"• Failed: {failed_executions}\\n"
@@ -378,7 +377,7 @@ class MockNotificationStrategy(NotificationStrategyABC):
             else:
                 results = mock_results[:3]  # Use mock results
                 
-            mock_message += f"\\n**Mock Results:**\\n"
+            mock_message += "\\n**Mock Results:**\\n"
             for result in results:
                 runbook_id = result.get("runbook_id", "unknown")
                 status = result.get("status", "unknown") 
@@ -393,12 +392,12 @@ class MockNotificationStrategy(NotificationStrategyABC):
             
             recommendations = summary.get("recommendations", mock_recommendations)
             if recommendations:
-                mock_message += f"\\n**Mock Recommendations:**\\n"
+                mock_message += "\\n**Mock Recommendations:**\\n"
                 for rec in recommendations[:2]:
                     mock_message += f"• {rec}\\n"
             
             # Add mock performance metrics
-            mock_message += f"\\n**Mock Performance:**\\n"
+            mock_message += "\\n**Mock Performance:**\\n"
             mock_message += f"• Avg Execution Time: {random.randint(5, 20)} minutes\\n"
             mock_message += f"• Incidents Resolved: {random.randint(1, 5)}\\n"
             
@@ -519,7 +518,7 @@ class MockNotificationStrategy(NotificationStrategyABC):
             if "required_actions" in escalation_context:
                 actions = escalation_context["required_actions"]
                 if isinstance(actions, list):
-                    mock_message += f"\\n**Required Actions:**\\n"
+                    mock_message += "\\n**Required Actions:**\\n"
                     for i, action in enumerate(actions, 1):
                         mock_message += f"{i}. {action}\\n"
             

@@ -10,7 +10,6 @@ import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 import random
-import uuid
 
 from .protocols import PersistenceStrategyABC
 from ..exceptions import IncidentTrackingError, MCPRunbookError
@@ -38,7 +37,7 @@ class MockPersistenceStrategy(PersistenceStrategyABC):
         # Initialize with some mock data
         self._initialize_mock_data()
         
-        logger.info(f"MockDataStrategy initialized with mock data")
+        logger.info("MockDataStrategy initialized with mock data")
     
     def _initialize_mock_data(self) -> None:
         """Initialize with some mock usage data and metrics."""
@@ -122,7 +121,7 @@ class MockPersistenceStrategy(PersistenceStrategyABC):
                             "timestamp": (datetime.utcnow() - timedelta(days=random.randint(1, 5))).isoformat()
                         },
                         {
-                            "comment": f"Runbook execution completed with mock results",
+                            "comment": "Runbook execution completed with mock results",
                             "timestamp": datetime.utcnow().isoformat()
                         }
                     ]
@@ -349,7 +348,7 @@ class MockPersistenceStrategy(PersistenceStrategyABC):
                     "ticket_id": ticket_id,
                     "runbook_id": "unknown",
                     "summary": f"Mock ticket {ticket_id}",
-                    "description": f"Mock ticket created during status update",
+                    "description": "Mock ticket created during status update",
                     "priority": "Medium",
                     "status": "Open",
                     "created_at": datetime.utcnow().isoformat(),

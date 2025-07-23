@@ -5,16 +5,14 @@ This module provides the NotificationStrategy implementation that integrates
 with the existing Slack communication tool for runbook-related notifications.
 """
 
-import asyncio
 import logging
 from typing import Dict, Any, Optional
 import httpx
 import os
 from datetime import datetime
-import json
 
 from .protocols import NotificationStrategyABC
-from ..exceptions import NotificationError, MCPRunbookError
+from ..exceptions import NotificationError
 
 logger = logging.getLogger(__name__)
 
@@ -202,13 +200,13 @@ class SlackNotificationStrategy(NotificationStrategyABC):
                 approvers_str = ", ".join([f"<@{approver}>" for approver in approvers])
                 message += f"**Approvers:** {approvers_str}\n"
             
-            message += f"\n**Details:**\n"
+            message += "\n**Details:**\n"
             if "description" in context:
                 message += f"{context['description']}\n"
             if "estimated_duration" in context:
                 message += f"Estimated Duration: {context['estimated_duration']}\n"
             if "rollback_procedure" in context:
-                message += f"Rollback Available: Yes\n"
+                message += "Rollback Available: Yes\n"
             
             message += f"\n*Approval requested at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC*"
             
@@ -366,7 +364,7 @@ class SlackNotificationStrategy(NotificationStrategyABC):
                 status_emoji = "⚠️"
                 
             message = f"{status_emoji} **WORKFLOW COMPLETED: {workflow_name}**\n\n"
-            message += f"**Summary:**\n"
+            message += "**Summary:**\n"
             message += f"• Total Runbooks: {total_runbooks}\n"
             message += f"• Successful: {successful_executions}\n"
             message += f"• Failed: {failed_executions}\n"
@@ -375,7 +373,7 @@ class SlackNotificationStrategy(NotificationStrategyABC):
             
             # Add detailed results if available
             if "results" in summary and summary["results"]:
-                message += f"\n**Results:**\n"
+                message += "\n**Results:**\n"
                 for result in summary["results"][:3]:  # Show first 3 results
                     runbook_id = result.get("runbook_id", "Unknown")
                     status = result.get("status", "unknown")
@@ -388,7 +386,7 @@ class SlackNotificationStrategy(NotificationStrategyABC):
             
             # Add recommendations if available
             if "recommendations" in summary and summary["recommendations"]:
-                message += f"\n**Recommendations:**\n"
+                message += "\n**Recommendations:**\n"
                 for rec in summary["recommendations"][:2]:  # Show first 2 recommendations
                     message += f"• {rec}\n"
             
@@ -396,7 +394,7 @@ class SlackNotificationStrategy(NotificationStrategyABC):
             if "metrics" in summary:
                 metrics = summary["metrics"]
                 if "avg_execution_time" in metrics:
-                    message += f"\n**Performance:**\n"
+                    message += "\n**Performance:**\n"
                     message += f"• Avg Execution Time: {metrics['avg_execution_time']}\n"
                 if "total_incidents_resolved" in metrics:
                     message += f"• Incidents Resolved: {metrics['total_incidents_resolved']}\n"

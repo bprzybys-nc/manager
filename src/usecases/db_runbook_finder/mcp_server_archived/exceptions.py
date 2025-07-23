@@ -5,7 +5,7 @@ This module defines the exception hierarchy for MCP server operations,
 extending the base GraphMCP framework exceptions.
 """
 
-from src.frameworks.graphmcp.clients.base import MCPToolError, MCPConnectionError
+from src.frameworks.graphmcp.clients.base import MCPToolError
 
 
 class MCPRunbookError(MCPToolError):

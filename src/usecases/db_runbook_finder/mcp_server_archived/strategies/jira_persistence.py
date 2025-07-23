@@ -5,13 +5,11 @@ This module provides the DataPersistenceStrategy implementation that integrates
 with the existing Jira tool for incident tracking and runbook usage persistence.
 """
 
-import asyncio
 import logging
 from typing import Dict, Any, Optional, List
 import httpx
 import os
 from datetime import datetime
-import json
 
 from .protocols import PersistenceStrategyABC
 from ..exceptions import IncidentTrackingError, MCPRunbookError

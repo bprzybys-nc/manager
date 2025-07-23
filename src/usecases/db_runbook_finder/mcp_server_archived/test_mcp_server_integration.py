@@ -9,11 +9,9 @@ import pytest
 import asyncio
 import time
 from datetime import datetime
-from unittest.mock import patch
 
 from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryServer
 from src.usecases.db_runbook_finder.mcp_server.strategy_factory import StrategyFactory, StrategyConfig
-from src.usecases.db_runbook_finder.mcp_server.client import RunbookRepositoryMCPClient
 
 
 @pytest.mark.skip(reason="Integration tests require complex MCP server setup - focusing on core functionality")

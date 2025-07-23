@@ -7,14 +7,12 @@ job tracking, health checks, and comprehensive error handling.
 
 import os
 import sys
-import json
 import time
-import asyncio
 from pathlib import Path
-from typing import Dict, Any, List, Optional, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from fastapi.testclient import TestClient
+    pass
 
 def main():
     """Main function to test all ChromaDB/Confluence endpoints comprehensively."""
@@ -464,7 +462,7 @@ def test_bulk_operations(client, data_loader):
         
         if response.status_code == 200:
             data = response.json()
-            print(f"  ✓ Statistics retrieved")
+            print("  ✓ Statistics retrieved")
             print(f"  Total jobs: {data.get('total_jobs', 0)}")
             results.append(("Job statistics", True, "Statistics retrieved"))
         else:

@@ -6,13 +6,12 @@ Tests semantic search capabilities using the ChromaDB vector database.
 
 import os
 import sys
-import json
 import time
 from pathlib import Path
-from typing import Dict, Any, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from fastapi.testclient import TestClient
+    pass
 
 def main():
     """Main function to test vector/ChromaDB endpoints."""
@@ -119,7 +118,7 @@ def run_vector_tests(client) -> int:
     test_results = []
     
     # Test 1: Health check - basic health endpoint
-    print(f"\n1. Testing GET /health (basic health check)")
+    print("\n1. Testing GET /health (basic health check)")
     print("-" * 45)
     try:
         response = client.get("/health")
@@ -139,7 +138,7 @@ def run_vector_tests(client) -> int:
         test_results.append(("Health check (basic)", False, f"Exception: {str(e)}"))
     
     # Test 2: GET /search/runbooks - Semantic runbook search
-    print(f"\n2. Testing GET /search/runbooks (semantic search)")
+    print("\n2. Testing GET /search/runbooks (semantic search)")
     print("-" * 50)
     try:
         test_query = "database connection timeout issues"
@@ -174,7 +173,7 @@ def run_vector_tests(client) -> int:
         test_results.append(("GET semantic search", False, f"Exception: {str(e)}"))
     
     # Test 3: GET /search/confluence - Regular Confluence search
-    print(f"\n3. Testing GET /search/confluence (confluence text search)")
+    print("\n3. Testing GET /search/confluence (confluence text search)")
     print("-" * 56)
     try:
         test_query = "database troubleshooting"
@@ -208,7 +207,7 @@ def run_vector_tests(client) -> int:
         test_results.append(("Confluence text search", False, f"Exception: {str(e)}"))
     
     # Test 4: Test different query types and limits
-    print(f"\n4. Testing various query patterns and limits")
+    print("\n4. Testing various query patterns and limits")
     print("-" * 45)
     try:
         test_queries = [
@@ -243,7 +242,7 @@ def run_vector_tests(client) -> int:
         test_results.append(("Multiple query patterns", False, f"Exception: {str(e)}"))
     
     # Test 5: Test error handling (empty query, invalid limits)
-    print(f"\n5. Testing error handling (validation)")
+    print("\n5. Testing error handling (validation)")
     print("-" * 42)
     try:
         error_tests = [
@@ -273,7 +272,7 @@ def run_vector_tests(client) -> int:
         test_results.append(("Error handling validation", False, f"Exception: {str(e)}"))
     
     # Test 6: Performance timing test
-    print(f"\n6. Testing search performance timing")
+    print("\n6. Testing search performance timing")
     print("-" * 37)
     try:
         performance_query = "database performance monitoring"

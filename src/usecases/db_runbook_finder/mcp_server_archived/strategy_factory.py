@@ -7,7 +7,7 @@ implementing the Real → Working → Mock hierarchy for graceful degradation.
 
 import logging
 import os
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional
 from enum import Enum
 
 from .strategies.protocols import (
@@ -115,7 +115,7 @@ class StrategyFactory:
                             timeout=self.config.timeout
                         )
                         if await strategy.health_check():
-                            logger.info(f"Created REAL discovery strategy: ConfluenceRunbookStrategy")
+                            logger.info("Created REAL discovery strategy: ConfluenceRunbookStrategy")
                             return strategy
                         else:
                             await strategy.close()
@@ -128,13 +128,13 @@ class StrategyFactory:
                         timeout=self.config.timeout
                     )
                     # For working tier, we're more lenient on health checks
-                    logger.info(f"Created WORKING discovery strategy: ConfluenceRunbookStrategy")
+                    logger.info("Created WORKING discovery strategy: ConfluenceRunbookStrategy")
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
                     from .strategies.mock_discovery import MockDiscoveryStrategy
                     strategy = MockDiscoveryStrategy()
-                    logger.info(f"Created MOCK discovery strategy: MockDiscoveryStrategy")
+                    logger.info("Created MOCK discovery strategy: MockDiscoveryStrategy")
                     return strategy
                     
             except Exception as e:
@@ -172,7 +172,7 @@ class StrategyFactory:
                             timeout=self.config.timeout
                         )
                         if await strategy.health_check():
-                            logger.info(f"Created REAL vector strategy: ChromaDBVectorStrategy")
+                            logger.info("Created REAL vector strategy: ChromaDBVectorStrategy")
                             return strategy
                         else:
                             await strategy.close()
@@ -183,13 +183,13 @@ class StrategyFactory:
                         base_url=self.config.confluence_url,
                         timeout=self.config.timeout
                     )
-                    logger.info(f"Created WORKING vector strategy: ChromaDBVectorStrategy")
+                    logger.info("Created WORKING vector strategy: ChromaDBVectorStrategy")
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
                     from .strategies.mock_vector import MockDBVectorStrategy
                     strategy = MockDBVectorStrategy()
-                    logger.info(f"Created MOCK vector strategy: MockVectorStrategy")
+                    logger.info("Created MOCK vector strategy: MockVectorStrategy")
                     return strategy
                     
             except Exception as e:
@@ -227,7 +227,7 @@ class StrategyFactory:
                             timeout=self.config.timeout
                         )
                         if await strategy.health_check():
-                            logger.info(f"Created REAL persistence strategy: JiraPersistenceStrategy")
+                            logger.info("Created REAL persistence strategy: JiraPersistenceStrategy")
                             return strategy
                         else:
                             await strategy.close()
@@ -238,13 +238,13 @@ class StrategyFactory:
                         base_url=self.config.jira_url,
                         timeout=self.config.timeout
                     )
-                    logger.info(f"Created WORKING persistence strategy: JiraPersistenceStrategy")
+                    logger.info("Created WORKING persistence strategy: JiraPersistenceStrategy")
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
                     from .strategies.mock_persistence import MockPersistenceStrategy
                     strategy = MockPersistenceStrategy()
-                    logger.info(f"Created MOCK persistence strategy: MockPersistenceStrategy")
+                    logger.info("Created MOCK persistence strategy: MockPersistenceStrategy")
                     return strategy
                     
             except Exception as e:
@@ -282,7 +282,7 @@ class StrategyFactory:
                             timeout=self.config.timeout
                         )
                         if await strategy.health_check():
-                            logger.info(f"Created REAL notification strategy: SlackNotificationStrategy")
+                            logger.info("Created REAL notification strategy: SlackNotificationStrategy")
                             return strategy
                         else:
                             await strategy.close()
@@ -293,13 +293,13 @@ class StrategyFactory:
                         base_url=self.config.slack_url,
                         timeout=self.config.timeout
                     )
-                    logger.info(f"Created WORKING notification strategy: SlackNotificationStrategy")
+                    logger.info("Created WORKING notification strategy: SlackNotificationStrategy")
                     return strategy
                     
                 elif tier == ImplementationTier.MOCK:
                     from .strategies.mock_notification import MockNotificationStrategy
                     strategy = MockNotificationStrategy()
-                    logger.info(f"Created MOCK notification strategy: MockNotificationStrategy")
+                    logger.info("Created MOCK notification strategy: MockNotificationStrategy")
                     return strategy
                     
             except Exception as e:

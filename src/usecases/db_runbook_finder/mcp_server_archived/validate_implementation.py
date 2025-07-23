@@ -9,9 +9,8 @@ import asyncio
 import sys
 import json
 import time
-import os
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -24,7 +23,6 @@ sys.path.insert(0, str(project_root))
 
 from src.usecases.db_runbook_finder.mcp_server.strategy_factory import StrategyFactory, StrategyConfig
 from src.usecases.db_runbook_finder.mcp_server.server import RunbookRepositoryServer
-from src.usecases.db_runbook_finder.mcp_server.client import RunbookRepositoryMCPClient
 from src.usecases.db_runbook_finder.mcp_server.config import MCPServerConfig
 from src.usecases.db_runbook_finder.workflow import DBRunbookFinderWorkflow
 

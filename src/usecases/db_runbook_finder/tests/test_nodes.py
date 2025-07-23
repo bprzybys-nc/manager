@@ -6,9 +6,7 @@ testing both success and error scenarios.
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime, UTC
+# datetime imports removed as they're no longer needed
 
 from src.usecases.db_runbook_finder.state import WorkflowState
 from src.usecases.db_runbook_finder.nodes import DBRunbookFinderNodes
@@ -259,8 +257,6 @@ class TestDBRunbookFinderNodes:
         nodes = db_runbook_finder_nodes
         
         # Test each node individually
-        start_time = datetime.now(UTC)
-        
         # Fetch incident
         state = await nodes.fetch_incident_node(populated_workflow_state)
         assert state.performance_metrics["fetch_incident"] < 5.0  # Should be very fast for mock

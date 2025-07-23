@@ -6,7 +6,7 @@ Jira tickets and find relevant runbooks through semantic search.
 """
 
 import time
-from typing import Dict, Any, List
+from typing import Dict, Any
 from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
 from .state import WorkflowState
@@ -30,10 +30,45 @@ class DBRunbookFinderNodes:
         # Add more mappings as needed
     }
     
-    def __init__(self):
-        """Initialize the nodes with logging configuration."""
+    def __init__(self, use_real_tools: bool = False):
+        """Initialize the nodes with logging configuration and tool integration.
+        
+        Args:
+            use_real_tools: Whether to use real tool integrations when available
+        """
         self.config = LoggingConfig.from_env()
         self.logger = get_logger(workflow_id="db_runbook_finder", config=self.config)
+        
+        # Direct tool integration configuration
+        self.use_real_tools = use_real_tools
+        self.jira_configured = self._check_tool_configured("JIRA")
+        self.confluence_configured = self._check_tool_configured("CONFLUENCE")
+        self.slack_configured = self._check_tool_configured("SLACK")
+        
+        if self.use_real_tools:
+            self.logger.log_info(f"Direct tool integration enabled - Jira: {self.jira_configured}, Confluence: {self.confluence_configured}, Slack: {self.slack_configured}")
+        else:
+            self.logger.log_info("Using mock implementations for all external tools")
+
+    def _check_tool_configured(self, tool_name: str) -> bool:
+        """Check if a tool is properly configured for direct integration.
+        
+        Args:
+            tool_name: Name of the tool (JIRA, CONFLUENCE, SLACK)
+            
+        Returns:
+            True if tool configuration is available
+        """
+        import os
+        
+        config_map = {
+            "JIRA": ["JIRA_URL", "JIRA_API_TOKEN"],
+            "CONFLUENCE": ["CONFLUENCE_URL", "CONFLUENCE_API_TOKEN"],
+            "SLACK": ["SLACK_BOT_TOKEN"]
+        }
+        
+        required_vars = config_map.get(tool_name, [])
+        return all(os.getenv(var) for var in required_vars)
 
     async def fetch_incident_node(self, state: WorkflowState) -> WorkflowState:
         """Fetch incident details from Jira.
@@ -51,18 +86,18 @@ class DBRunbookFinderNodes:
         start_time = time.time()
         
         try:
-            # TODO: Replace with actual MCP client call
-            # response = await self.mcp_client.call_tool(
-            #     "jira", 
-            #     "get_ticket_details", 
-            #     {"issueIdOrKey": state.jira_key}
-            # )
-            
-            # Mock response for development/testing
-            mock_response = self._get_mock_jira_response(state.jira_key)
+            # Direct tool integration point
+            if self.use_real_tools and self.jira_configured:
+                from src.tools.jira.app.jira import JiraClient
+                jira_client = JiraClient()
+                response = await jira_client.get_ticket(state.jira_key)
+                jira_data = response  # Real API response
+            else:
+                # Mock implementation for development/testing
+                jira_data = self._get_mock_jira_response(state.jira_key)
             
             # Extract relevant information from Jira response
-            fields = mock_response.get("fields", {})
+            fields = jira_data.get("fields", {})
             project_key = fields.get("project", {}).get("key", "")
             
             state.incident_data = {
@@ -123,22 +158,20 @@ class DBRunbookFinderNodes:
                 state.add_performance_metric("search_runbooks", duration)
                 return state
             
-            # TODO: Replace with actual MCP client call
-            # response = await self.mcp_client.call_tool(
-            #     "confluence",
-            #     "vector_search",
-            #     {
-            #         "query": query,
-            #         "space_keys": ["AAVA", "MCDBA"],
-            #         "limit": 3
-            #     }
-            # )
-            
-            # Mock response for development/testing
-            mock_response = self._get_mock_confluence_response(query, state.jira_key)
-            
-            # Store search results
-            state.runbooks = mock_response.get("results", [])
+            # Direct tool integration point
+            if self.use_real_tools and self.confluence_configured:
+                from src.tools.confluence.app.api import ConfluenceClient
+                confluence_client = ConfluenceClient()
+                response = await confluence_client.search_runbooks(
+                    query=query,
+                    spaces=["AAVA", "MCDBA"],
+                    limit=3
+                )
+                state.runbooks = response.get("results", [])
+            else:
+                # Mock implementation for development/testing
+                mock_response = self._get_mock_confluence_response(query, state.jira_key)
+                state.runbooks = mock_response.get("results", [])
             
             duration = time.time() - start_time
             state.add_performance_metric("search_runbooks", duration)
@@ -202,7 +235,7 @@ class DBRunbookFinderNodes:
             
             comment_lines.extend([
                 "**Additional Information:**",
-                f"- Search performed against: AAVA, MCDBA spaces",
+                "- Search performed against: AAVA, MCDBA spaces",
                 f"- Client: {state.get_client_name()}",
                 f"- Processing time: {state.get_total_duration():.2f} seconds",
                 "",
@@ -212,18 +245,16 @@ class DBRunbookFinderNodes:
             
             comment_text = "\n".join(comment_lines)
             
-            # TODO: Replace with actual MCP client call
-            # await self.mcp_client.call_tool(
-            #     "jira",
-            #     "add_comment",
-            #     {
-            #         "issueIdOrKey": state.jira_key,
-            #         "comment": comment_text
-            #     }
-            # )
+            # Direct tool integration point (future enhancement)
+            # TODO: Implement direct Jira tool integration when available
+            # if self.use_real_tools and self.jira_configured:
+            #     from src.tools.jira.app.jira import JiraClient
+            #     jira_client = JiraClient()
+            #     await jira_client.add_comment(state.jira_key, comment_text)
             
             # Mock comment addition
             self.logger.log_info(f"Mock: Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
+            self.logger.log_debug(f"Comment content preview: {comment_text[:100]}...")
             
             duration = time.time() - start_time
             state.add_performance_metric("update_jira_results", duration)
@@ -284,7 +315,7 @@ class DBRunbookFinderNodes:
                 "4. Review and update indexed runbook content if needed",
                 "",
                 "**Search Details:**",
-                f"- Searched spaces: AAVA, MCDBA",
+                "- Searched spaces: AAVA, MCDBA",
                 f"- Query used: {state.get_search_query()[:200]}{'...' if len(state.get_search_query()) > 200 else ''}",
                 f"- Processing time: {state.get_total_duration():.2f} seconds",
                 "",
@@ -294,18 +325,16 @@ class DBRunbookFinderNodes:
             
             comment_text = "\n".join(gap_comment)
             
-            # TODO: Replace with actual MCP client call
-            # await self.mcp_client.call_tool(
-            #     "jira",
-            #     "add_comment",
-            #     {
-            #         "issueIdOrKey": state.jira_key,
-            #         "comment": comment_text
-            #     }
-            # )
+            # Direct tool integration point (future enhancement)
+            # TODO: Implement direct Jira tool integration when available
+            # if self.use_real_tools and self.jira_configured:
+            #     from src.tools.jira.app.jira import JiraClient
+            #     jira_client = JiraClient()
+            #     await jira_client.add_comment(state.jira_key, comment_text)
             
             # Mock comment addition
             self.logger.log_info(f"Mock: Added gap comment to {state.jira_key}")
+            self.logger.log_debug(f"Gap comment content preview: {comment_text[:100]}...")
             
             duration = time.time() - start_time
             state.add_performance_metric("terminate_gap", duration)
@@ -394,18 +423,16 @@ class DBRunbookFinderNodes:
             
             message_text = "\n".join(message_lines)
             
-            # TODO: Replace with actual MCP client call
-            # await self.mcp_client.call_tool(
-            #     "slack",
-            #     "send_message",
-            #     {
-            #         "channel": "#mc-dba-jira-notifications",
-            #         "text": message_text
-            #     }
-            # )
+            # Direct tool integration point (future enhancement)
+            # TODO: Implement direct Slack tool integration when available
+            # if self.use_real_tools and self.slack_configured:
+            #     from src.tools.communication.slack import SlackClient
+            #     slack_client = SlackClient()
+            #     await slack_client.send_message("#mc-dba-jira-notifications", message_text)
             
             # Mock notification
             self.logger.log_info(f"Mock: Sent {state.status} notification to Slack for {state.jira_key}")
+            self.logger.log_debug(f"Notification content preview: {message_text[:100]}...")
             
             duration = time.time() - start_time
             state.add_performance_metric("notify_team", duration)

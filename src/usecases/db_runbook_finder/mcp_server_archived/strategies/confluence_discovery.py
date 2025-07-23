@@ -5,7 +5,6 @@ This module provides the RunbookDiscoveryStrategy implementation that integrates
 with the existing Confluence tool for runbook discovery operations.
 """
 
-import asyncio
 import logging
 from typing import List, Dict, Any, Optional
 import httpx
@@ -13,7 +12,7 @@ import os
 from datetime import datetime
 
 from .protocols import RunbookDiscoveryStrategyABC
-from ..exceptions import MCPRunbookError, RunbookNotFoundError
+from ..exceptions import MCPRunbookError
 
 logger = logging.getLogger(__name__)
 

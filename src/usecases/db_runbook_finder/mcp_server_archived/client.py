@@ -5,17 +5,15 @@ This module provides the MCP client for the RunbookRepositoryMCP server,
 following GraphMCP BaseClient patterns with full compliance.
 """
 
-import asyncio
 import logging
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
-from src.frameworks.graphmcp.clients.base import BaseMCPClient, MCPConnectionError, MCPToolError
+from src.frameworks.graphmcp.clients.base import BaseMCPClient, MCPToolError
 from .exceptions import (
     MCPRunbookError, 
     RunbookNotFoundError, 
-    VectorSearchError, 
-    StrategyUnavailableError
+    VectorSearchError
 )
 
 logger = logging.getLogger(__name__)

@@ -10,10 +10,9 @@ import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import random
-from pathlib import Path
 
 from .protocols import RunbookDiscoveryStrategyABC
-from ..exceptions import MCPRunbookError, RunbookNotFoundError
+from ..exceptions import MCPRunbookError
 
 logger = logging.getLogger(__name__)
 

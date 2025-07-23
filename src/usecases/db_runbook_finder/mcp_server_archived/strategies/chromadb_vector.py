@@ -5,7 +5,6 @@ This module provides the VectorStorageStrategy implementation that integrates
 with the existing Confluence tool's VectorStore for semantic search operations.
 """
 
-import asyncio
 import logging
 from typing import List, Dict, Any, Optional
 import httpx

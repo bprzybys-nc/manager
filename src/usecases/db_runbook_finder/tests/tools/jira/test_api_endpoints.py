@@ -6,8 +6,6 @@ This script tests all Jira API endpoints with real API calls.
 
 import os
 import sys
-import json
-import subprocess
 from pathlib import Path
 
 def main_internal():
@@ -194,7 +192,7 @@ def run_tests(client):
         if response.status_code == 200:
             data = response.json()
             comments = data.get('comments', [])
-            print(f"✓ Successfully retrieved updated ticket details")
+            print("✓ Successfully retrieved updated ticket details")
             print(f"Total comments: {len(comments)}")
             
             # Look for our test comments
