@@ -19,26 +19,26 @@
 
 | Node | Component | Real Implementation | Mock Implementation | Current Default |
 |------|-----------|-------------------|-------------------|-----------------|
-| 📥 | Jira API Call | ✅ `JiraClient.get_ticket()` | ✅ `_get_mock_jira_response()` | **Real** (if configured) |
-| 📥 | Data Extraction | ✅ Fields parsing | ✅ Fields parsing | **Same logic** |
-| 📥 | Error Handling | ✅ Try/catch + logging | ✅ Try/catch + logging | **Same logic** |
-| 📥 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | **Same logic** |
-| 🔎 | Query Construction | ✅ `state.get_search_query()` | ✅ `state.get_search_query()` | **Same logic** |
-| 🔎 | Confluence API Call | ✅ `ConfluenceClient.search_runbooks()` | ✅ `_get_mock_confluence_response()` | **Real** (if configured) |
-| 🔎 | Result Processing | ✅ Response parsing | ✅ Response parsing | **Same logic** |
-| 🔎 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | **Same logic** |
-| 📝 | Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | **Same logic** |
-| 📝 | Jira Comment Addition | 🚧 TODO (lines 249-253) | ✅ Mock logging | **Mock** (real TODO) |
-| 📝 | Success Status Update | ✅ `state.update_status("SUCCESS")` | ✅ `state.update_status("SUCCESS")` | **Same logic** |
-| 📝 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | **Same logic** |
-| ⚠️ | Gap Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | **Same logic** |
-| ⚠️ | Jira Comment Addition | 🚧 TODO (lines 329-333) | ✅ Mock logging | **Mock** (real TODO) |
-| ⚠️ | Gap Status Update | ✅ `state.update_status("GAP_DETECTED")` | ✅ `state.update_status("GAP_DETECTED")` | **Same logic** |
-| ⚠️ | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | **Same logic** |
-| 📢 | Message Formatting | ✅ Status-based templating | ✅ Status-based templating | **Same logic** |
-| 📢 | Slack Message Send | 🚧 TODO (lines 427-431) | ✅ Mock logging | **Mock** (real TODO) |
-| 📢 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | **Same logic** |
-| 📢 | Status Preservation | ✅ No status override | ✅ No status override | **Same logic** |
+| 📥 | Jira API Call | ✅ `JiraClient.get_ticket()` | ✅ `_get_mock_jira_response()` | 🟢 **Real** (if configured) |
+| 📥 | Data Extraction | ✅ Fields parsing | ✅ Fields parsing | 🟢 **Same logic** |
+| 📥 | Error Handling | ✅ Try/catch + logging | ✅ Try/catch + logging | 🟢 **Same logic** |
+| 📥 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
+| 🔎 | Query Construction | ✅ `state.get_search_query()` | ✅ `state.get_search_query()` | 🟢 **Same logic** |
+| 🔎 | Confluence API Call | ✅ `ConfluenceClient.search_runbooks()` | ✅ `_get_mock_confluence_response()` | 🟢 **Real** (if configured) |
+| 🔎 | Result Processing | ✅ Response parsing | ✅ Response parsing | 🟢 **Same logic** |
+| 🔎 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
+| 📝 | Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | 🟢 **Same logic** |
+| 📝 | Jira Comment Addition | 🚧 TODO (lines 249-253) | ✅ Mock logging | 🟡 **Mock** (real TODO) |
+| 📝 | Success Status Update | ✅ `state.update_status("SUCCESS")` | ✅ `state.update_status("SUCCESS")` | 🟢 **Same logic** |
+| 📝 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
+| ⚠️ | Gap Comment Formatting | ✅ Rich text generation | ✅ Rich text generation | 🟢 **Same logic** |
+| ⚠️ | Jira Comment Addition | 🚧 TODO (lines 329-333) | ✅ Mock logging | 🟡 **Mock** (real TODO) |
+| ⚠️ | Gap Status Update | ✅ `state.update_status("GAP_DETECTED")` | ✅ `state.update_status("GAP_DETECTED")` | 🟢 **Same logic** |
+| ⚠️ | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
+| 📢 | Message Formatting | ✅ Status-based templating | ✅ Status-based templating | 🟢 **Same logic** |
+| 📢 | Slack Message Send | 🚧 TODO (lines 427-431) | ✅ Mock logging | 🟡 **Mock** (real TODO) |
+| 📢 | Performance Tracking | ✅ `add_performance_metric()` | ✅ `add_performance_metric()` | 🟢 **Same logic** |
+| 📢 | Status Preservation | ✅ No status override | ✅ No status override | 🟢 **Same logic** |
 
 ## Configuration & Activation
 
