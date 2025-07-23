@@ -192,7 +192,9 @@
       "Bash(python -m pytest src/usecases/db_runbook_finder/tests/test_nodes.py -q)",
       "mcp__filesystem__read_multiple_files",
       "mcp__filesystem__read_file",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "mcp__jetbrains__list_files_in_folder",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest *)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",
