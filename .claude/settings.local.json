@@ -202,7 +202,17 @@
       "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -v --ignore=src/usecases/db_runbook_finder/tests/test_workflow.py --timeout=30)",
       "mcp__filesystem__search_files",
       "Bash(python:*)",
-      "mcp__git__git_status"
+      "mcp__git__git_status",
+      "mcp__jetbrains__replace_specific_text",
+      "mcp__jetbrains__create_new_file_with_text",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackIntegration::test_successful_slack_notification -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackIntegration::test_slack_failure_graceful_fallback -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackIntegration -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackIntegration::test_message_content_security -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackIntegration::test_multiple_runbooks_formatting -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_integration.py::TestSlackPerformance -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/test_slack_communication_simple.py -v)",
+      "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -v --tb=short)"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

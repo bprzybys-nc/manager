@@ -544,13 +544,19 @@ class DBRunbookFinderNodes:
         start_time = time.time()
         
         try:
-            # Format message based on status
+            import html
+            
+            # Format message based on status with content sanitization
             if state.status == "SUCCESS":
+                # Sanitize content for security
+                safe_summary = html.escape(state.get_incident_summary()[:100])
+                safe_client = html.escape(state.get_client_name())
+                
                 message_lines = [
                     f"✅ **Runbook Recommendations Found** - {state.jira_key}",
                     "",
-                    f"**Incident:** {state.get_incident_summary()}",
-                    f"**Client:** {state.get_client_name()}",
+                    f"**Incident:** {safe_summary}{'...' if len(state.get_incident_summary()) > 100 else ''}",
+                    f"**Client:** {safe_client}",
                     f"**Runbooks Found:** {len(state.runbooks)}",
                     f"**Processing Time:** {state.get_total_duration():.2f} seconds",
                     "",
@@ -558,39 +564,46 @@ class DBRunbookFinderNodes:
                 ]
                 
                 for i, runbook in enumerate(state.runbooks[:2], 1):
-                    title = runbook.get("title", "Unknown Title")
+                    title = html.escape(runbook.get("title", "Unknown Title"))
                     relevance = runbook.get("relevance_score", 0)
                     message_lines.append(f"{i}. {title} ({relevance:.1%} relevance)")
                 
                 message_lines.extend([
                     "",
-                    f"🔗 View ticket: [Jira Link](#{state.jira_key})"
+                    f"🔗 View ticket: <https://nordcloud.atlassian.net/browse/{state.jira_key}|{state.jira_key}>"
                 ])
                 
             elif state.status == "GAP_DETECTED":
+                # Sanitize content for security
+                safe_summary = html.escape(state.get_incident_summary()[:100])
+                safe_client = html.escape(state.get_client_name())
+                
                 message_lines = [
                     f"⚠️ **Runbook Gap Detected** - {state.jira_key}",
                     "",
-                    f"**Incident:** {state.get_incident_summary()}",
-                    f"**Client:** {state.get_client_name()}",
+                    f"**Incident:** {safe_summary}{'...' if len(state.get_incident_summary()) > 100 else ''}",
+                    f"**Client:** {safe_client}",
                     f"**Processing Time:** {state.get_total_duration():.2f} seconds",
                     "",
                     "No relevant runbooks found. Manual intervention required.",
                     "Consider creating new runbook for this incident type.",
                     "",
-                    f"🔗 View ticket: [Jira Link](#{state.jira_key})"
+                    f"🔗 View ticket: <https://nordcloud.atlassian.net/browse/{state.jira_key}|{state.jira_key}>"
                 ]
                 
             else:  # ERROR state
+                # Sanitize error message for security
+                safe_error = html.escape(state.error_message[:200] if state.error_message else "Unknown error")
+                
                 message_lines = [
                     f"❌ **Workflow Error** - {state.jira_key}",
                     "",
-                    f"**Error:** {state.error_message}",
+                    f"**Error:** {safe_error}{'...' if state.error_message and len(state.error_message) > 200 else ''}",
                     f"**Processing Time:** {state.get_total_duration():.2f} seconds",
                     "",
                     "Please check logs for detailed error information.",
                     "",
-                    f"🔗 View ticket: [Jira Link](#{state.jira_key})"
+                    f"🔗 View ticket: <https://nordcloud.atlassian.net/browse/{state.jira_key}|{state.jira_key}>"
                 ]
             
             message_text = "\n".join(message_lines)
@@ -599,35 +612,60 @@ class DBRunbookFinderNodes:
             print("📢 Preparing team notification...")
             print(f"📝 Message prepared for {state.jira_key} ({state.status})")
             
-            # REAL SLACK INTEGRATION - Replace lines 534-543 with GraphMCP SlackMCPClient
+            # Status-specific progress indicators
+            if state.status == "SUCCESS":
+                print(f"✅ Found {len(state.runbooks)} runbook recommendations")
+            elif state.status == "GAP_DETECTED":
+                print("⚠️ Gap detected - manual intervention required")
+            else:
+                print("❌ Workflow error occurred")
+
+            # REAL SLACK INTEGRATION - Direct Communication Tool integration
             if self.use_real_tools and self.slack_configured:
                 print("🚀 Sending Slack notification...")
                 
                 try:
-                    from src.frameworks.graphmcp.clients.slack import SlackMCPClient
+                    from src.tools.communication.app.slack import Slack
+                    from src.modules.task.db import TaskDB
+                    from pymongo import MongoClient
+                    import os
+                    from dotenv import load_dotenv
                     
-                    # Initialize Slack client with MCP configuration
-                    slack_client = SlackMCPClient(self.config_path)
+                    # Ensure .env variables are loaded with override
+                    load_dotenv(override=True)
                     
-                    # Send message to #mc-dba-jira-notifications channel (C066PQYUYR4)
-                    result = await slack_client.post_message("C066PQYUYR4", message_text)
+                    # Initialize TaskDB dependency (required by Slack client)
+                    connection_string = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017')
+                    db_client = MongoClient(connection_string)
+                    task_db = TaskDB(db_client)
                     
-                    if result.get("success"):
+                    # Initialize direct Slack client (no MCP, no SLACK_TEAM_ID)
+                    slack_client = Slack(
+                        bot_token=os.getenv("SLACK_BOT_TOKEN"),
+                        app_token=os.getenv("SLACK_APP_TOKEN"),
+                        channel=os.getenv("SLACK_CHANNEL"),  # C066PQYUYR4
+                        task_db=task_db
+                    )
+                    
+                    # Send message as new thread to #mc-dba-jira-notifications
+                    thread_id = slack_client.create_thread(message_text)
+                    
+                    if thread_id:
                         print(f"✅ Successfully sent {state.status} notification to Slack for {state.jira_key}")
                         self.logger.log_info("✅ Slack notification sent successfully", extra={
                             "jira_key": state.jira_key,
                             "status": state.status,
-                            "message_ts": result.get("message_ts"),
+                            "thread_id": thread_id,
                             "channel": "#mc-dba-jira-notifications"
                         })
                         
                         # Update state with Slack delivery confirmation
                         state.slack_message_sent = True
-                        state.slack_message_ts = result.get("message_ts")
+                        state.slack_message_ts = thread_id
                         
                     else:
-                        print(f"⚠️ Failed to send Slack notification: {result.get('error')}")
-                        self.logger.log_warning(f"⚠️ Slack notification failed: {result.get('error')}")
+                        print(f"⚠️ Failed to send Slack notification: No thread ID returned")
+                        self.logger.log_warning(f"⚠️ Slack notification failed: No thread ID returned")
                         
                         # Graceful fallback to mock
                         print("🔄 Falling back to mock notification")

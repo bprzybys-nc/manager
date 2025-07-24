@@ -26,7 +26,7 @@ class TestSlackCommunicationSimple:
             
     def test_slack_formatting_enum_available(self):
         """Test that SlackFormatting enum is available."""
-        from src.tools.communication_536ab1c.app.slack import SlackFormatting
+        from src.tools.communication.app.slack import SlackFormatting
         
         # Test that all expected formatting options exist
         assert hasattr(SlackFormatting, 'BOLD')
@@ -93,7 +93,7 @@ class TestSlackCommunicationSimple:
         
     def test_slack_api_format_functions(self):
         """Test that we can format messages correctly for Slack."""
-        from src.tools.communication_536ab1c.app.slack import SlackFormatting
+        from src.tools.communication.app.slack import SlackFormatting
         
         # Test message formatting expectations
         test_message = "This is a test message"
