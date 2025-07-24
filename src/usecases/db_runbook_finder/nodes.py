@@ -418,7 +418,7 @@ class DBRunbookFinderNodes:
                 print("🔗 Adding comment to Jira ticket...")
                 from src.tools.jira.app.jira import JiraClient
                 jira_client = JiraClient()
-                jira_client.add_comment(state.jira_key, comment_text)
+                jira_client.add_internal_comment(state.jira_key, comment_text)
                 print("✅ Real Jira comment added successfully")
                 self.logger.log_info(f"Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
             else:
@@ -501,7 +501,7 @@ class DBRunbookFinderNodes:
             if self.use_real_tools and self.jira_configured:
                 from src.tools.jira.app.jira import JiraClient
                 jira_client = JiraClient()
-                jira_client.add_comment(state.jira_key, comment_text)
+                jira_client.add_internal_comment(state.jira_key, comment_text)
                 self.logger.log_info(f"Added gap comment to {state.jira_key}")
             else:
                 # Mock comment addition

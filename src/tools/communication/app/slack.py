@@ -19,6 +19,7 @@ from src.modules.task.db import Task, CommandType, Type, State, TaskDB
 class SlackFormatting(Enum):
     BOLD = "bold"
     ITALIC = "italic"
+
     CODE = "code"
     CODE_BLOCK = "code_block"
 
