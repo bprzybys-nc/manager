@@ -1,0 +1,14 @@
+{
+    "id":"8082436309665268856",
+    "source":"datadog",
+    "last_updated":"1746013550000",
+    "event_type":"query_alert_monitor",
+    "title":"[Triggered on {host:db-incident-sandbox}] DB Host is near the max CPU usage limit",
+    "date":"1746013550000",
+    "org":{
+       "id":"1325540",
+       "name":"IBM Ovora"
+    },
+    "body":"%%%\nCPU usage reached a ceiling.\n\nTriggered for:\n- Host: db-incident-sandbox\n- Value: 63.002 (Threshold: 60.0)\n\n@webhook-ovora-incident-assistant\n\n\n[![Metric Graph](https://p.datadoghq.com/snapshot/view/dd-snapshots-prod/org_1325540/2025-04-30/969acb70593fa0738f73c95a8e006f7b9d1d083f.png)](https://app.datadoghq.com/monitors/170773010?group=host%3Adb-incident-sandbox&from_ts=1746012650000&to_ts=1746013850000&event_id=8082436309665268856&link_source=monitor_notif)\n\n**system.cpu.user** over **host:db-incident-sandbox** was **> 60.0** on average during the **last 5m**.\n\nThe monitor was last triggered at Wed Apr 30 2025 11:45:50 UTC.\n\n- - -\n\n[[Monitor Status](https://app.datadoghq.com/monitors/170773010?group=host%3Adb-incident-sandbox&from_ts=1746012650000&to_ts=1746013850000&event_id=8082436309665268856&link_source=monitor_notif)] · [[Edit Monitor](https://app.datadoghq.com/monitors/170773010/edit?link_source=monitor_notif)] · [[View db-incident-sandbox](https://app.datadoghq.com/infrastructure?filter=db-incident-sandbox&link_source=monitor_notif)] · [[Show Processes](https://app.datadoghq.com/process?from_ts=1746013250000&to_ts=1746013670000&live=false&showSummaryGraphs=true&sort=cpu%2CDESC&query=host%3Adb-incident-sandbox&link_source=monitor_notif)]\n%%%",
+    "hostname":"db-incident-sandbox"
+ }
