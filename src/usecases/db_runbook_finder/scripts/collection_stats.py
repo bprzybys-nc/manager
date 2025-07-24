@@ -29,7 +29,7 @@ def main():
         collection = vs._collection
         count = collection.count()
         
-        print(f'📊 ChromaDB Collection Analytics: mcdb-runbooks')
+        print('📊 ChromaDB Collection Analytics: mcdb-runbooks')
         print('='*60)
         
         if count == 0:
@@ -41,7 +41,7 @@ def main():
         results = collection.get(limit=1000)
         
         # Basic stats
-        print(f'📈 BASIC STATISTICS')
+        print('📈 BASIC STATISTICS')
         print(f'   Total chunks: {count}')
         print(f'   Documents retrieved: {len(results["ids"])}')
         print()
@@ -83,7 +83,7 @@ def main():
             content_lengths.append(len(document))
         
         # Client breakdown
-        print(f'🏢 CLIENT BREAKDOWN')
+        print('🏢 CLIENT BREAKDOWN')
         for client, chunk_count in client_stats.items():
             runbook_count = sum(1 for r in runbook_stats.values() if r['client'].lower() == client.lower())
             print(f'   {client}: {runbook_count} runbooks ({chunk_count} chunks)')
@@ -91,7 +91,7 @@ def main():
         
         # Chunk distribution
         chunk_counts = [r['chunks'] for r in runbook_stats.values()]
-        print(f'🧩 CHUNK DISTRIBUTION')
+        print('🧩 CHUNK DISTRIBUTION')
         print(f'   Average chunks per runbook: {sum(chunk_counts) / len(chunk_counts):.1f}')
         print(f'   Min chunks: {min(chunk_counts)}')
         print(f'   Max chunks: {max(chunk_counts)}')
@@ -99,7 +99,7 @@ def main():
         print()
         
         # Content length analysis
-        print(f'📝 CONTENT ANALYSIS')
+        print('📝 CONTENT ANALYSIS')
         print(f'   Average chunk length: {sum(content_lengths) / len(content_lengths):.0f} chars')
         print(f'   Shortest chunk: {min(content_lengths)} chars')
         print(f'   Longest chunk: {max(content_lengths)} chars')
@@ -107,7 +107,7 @@ def main():
         print()
         
         # Top runbooks by content
-        print(f'📚 TOP RUNBOOKS BY CONTENT SIZE')
+        print('📚 TOP RUNBOOKS BY CONTENT SIZE')
         sorted_runbooks = sorted(runbook_stats.values(), key=lambda x: x['total_content_length'], reverse=True)
         for i, runbook in enumerate(sorted_runbooks[:5], 1):
             print(f'   {i}. {runbook["title"]} ({runbook["client"]})')
@@ -115,7 +115,7 @@ def main():
         print()
         
         # Most chunked runbooks
-        print(f'🧩 MOST CHUNKED RUNBOOKS')
+        print('🧩 MOST CHUNKED RUNBOOKS')
         sorted_by_chunks = sorted(runbook_stats.values(), key=lambda x: x['chunks'], reverse=True)
         for i, runbook in enumerate(sorted_by_chunks[:5], 1):
             print(f'   {i}. {runbook["title"]} ({runbook["client"]})')
@@ -123,7 +123,7 @@ def main():
         print()
         
         # Tag analysis
-        print(f'🏷️ TAG DISTRIBUTION')
+        print('🏷️ TAG DISTRIBUTION')
         for tag, count in tag_stats.most_common():
             print(f'   {tag}: {count} chunks')
         print()

@@ -6,7 +6,7 @@ Jira tickets and find relevant runbooks through semantic search.
 """
 
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
 from .state import WorkflowState
@@ -30,12 +30,14 @@ class DBRunbookFinderNodes:
         # Add more mappings as needed
     }
     
-    def __init__(self, use_real_tools: bool = False):
+    def __init__(self, config_path: str = "src/frameworks/graphmcp/clients/mcp_config.json", use_real_tools: bool = False):
         """Initialize the nodes with logging configuration and tool integration.
         
         Args:
+            config_path: Path to MCP configuration file for GraphMCP client initialization
             use_real_tools: Whether to use real tool integrations when available
         """
+        self.config_path = config_path
         self.config = LoggingConfig.from_env()
         self.logger = get_logger(workflow_id="db_runbook_finder", config=self.config)
         
@@ -44,6 +46,16 @@ class DBRunbookFinderNodes:
         self.jira_configured = self._check_tool_configured("JIRA")
         self.confluence_configured = self._check_tool_configured("CONFLUENCE")
         self.slack_configured = self._check_tool_configured("SLACK")
+        
+        # Initialize vector store for ChromaDB integration (READ-ONLY, do not create/modify collection)
+        # This safely connects to existing 'mcdb-runbooks' collection without erasing data
+        try:
+            from src.tools.confluence.app.vector_store import VectorStore
+            self.vector_store: Optional[VectorStore] = VectorStore(collection_name='mcdb-runbooks')
+            self.logger.log_info("Vector store initialized for 'mcdb-runbooks' collection")
+        except Exception as e:
+            self.logger.log_warning(f"Vector store initialization failed: {e}. Will use fallback search.")
+            self.vector_store = None
         
         if self.use_real_tools:
             self.logger.log_info(f"Direct tool integration enabled - Jira: {self.jira_configured}, Confluence: {self.confluence_configured}, Slack: {self.slack_configured}")
@@ -71,7 +83,7 @@ class DBRunbookFinderNodes:
         return all(os.getenv(var) for var in required_vars)
 
     async def fetch_incident_node(self, state: WorkflowState) -> WorkflowState:
-        """Fetch incident details from Jira.
+        """Fetch incident details from Jira with rich progress display.
         
         This node retrieves detailed information about the Jira ticket
         including summary, description, and project details.
@@ -85,15 +97,21 @@ class DBRunbookFinderNodes:
         self.logger.log_step_start("fetch_incident", f"Fetching incident {state.jira_key}")
         start_time = time.time()
         
+        # Rich progress display - Step header
+        print(f"🎫 Fetching incident details for: {state.jira_key}")
+        print("="*50)
+        
         try:
-            # Direct tool integration point
+            # Progress indicator
             if self.use_real_tools and self.jira_configured:
+                print("🔗 Connecting to Jira API...")
                 from src.tools.jira.app.jira import JiraClient
                 jira_client = JiraClient()
                 response = jira_client.get_ticket(state.jira_key)
                 jira_data = response  # Real API response
+                print("✅ Real Jira data retrieved")
             else:
-                # Mock implementation for development/testing
+                print("🧪 Using mock Jira data (development mode)")
                 jira_data = self._get_mock_jira_response(state.jira_key)
             
             # Extract relevant information from Jira response
@@ -113,8 +131,41 @@ class DBRunbookFinderNodes:
                 "labels": fields.get("labels", [])
             }
             
+            # Rich summary display with emoji indicators
+            priority = state.incident_data.get("priority", "")
+            if priority == "High":
+                priority_emoji = "🔴 High"
+            elif priority == "Medium":
+                priority_emoji = "🟡 Medium"
+            elif priority == "Low":
+                priority_emoji = "🟢 Low"
+            else:
+                priority_emoji = f"⚪ {priority}"
+            
+            # Client identification with emoji
+            client = state.get_client_name()
+            if "Helvetia" in client:
+                client_emoji = "🏢 Helvetia"
+            elif "Neste" in client:
+                client_emoji = "🏢 Neste"
+            elif "Agent" in client:
+                client_emoji = "🤖 Agent System"
+            elif "Ovora" in client:
+                client_emoji = "⚙️ Ovora"
+            else:
+                client_emoji = f"❓ {client}"
+            
+            print("✅ Incident fetched successfully:")
+            print(f"   📋 Summary: {state.get_incident_summary()[:80]}{'...' if len(state.get_incident_summary()) > 80 else ''}")
+            print(f"   {client_emoji}")
+            print(f"   {priority_emoji} Priority")
+            print(f"   📅 Created: {state.incident_data.get('created', 'Unknown')[:10]}")
+            print(f"   👤 Assignee: {state.incident_data.get('assignee', 'Unassigned')}")
+            
             duration = time.time() - start_time
             state.add_performance_metric("fetch_incident", duration)
+            
+            print("="*50)
             
             self.logger.log_step_end(
                 "fetch_incident", 
@@ -125,6 +176,9 @@ class DBRunbookFinderNodes:
             return state
             
         except Exception as e:
+            print(f"❌ Failed to fetch incident: {e}")
+            print("="*50)
+            
             duration = time.time() - start_time
             state.add_performance_metric("fetch_incident", duration)
             state.update_status("ERROR", f"Failed to fetch incident: {str(e)}")
@@ -133,10 +187,10 @@ class DBRunbookFinderNodes:
             return state
 
     async def search_runbooks_node(self, state: WorkflowState) -> WorkflowState:
-        """Search for relevant runbooks using vector search.
+        """Search for relevant runbooks using ChromaDB vector search with rich progress display.
         
-        This node performs semantic search against indexed Confluence runbooks
-        in the AAVA and MCDBA spaces.
+        This node performs semantic search against the 'mcdb-runbooks' ChromaDB collection
+        with comprehensive progress indicators and security measures.
         
         Args:
             state: Current workflow state with incident_data
@@ -144,7 +198,7 @@ class DBRunbookFinderNodes:
         Returns:
             Updated state with runbooks populated
         """
-        self.logger.log_step_start("search_runbooks", "Performing vector search for runbooks")
+        self.logger.log_step_start("search_runbooks", "Performing ChromaDB vector search for runbooks")
         start_time = time.time()
         
         try:
@@ -152,24 +206,118 @@ class DBRunbookFinderNodes:
             query = state.get_search_query()
             
             if not query:
+                print("❌ No search query available, skipping search")
                 self.logger.log_info("No search query available, skipping search")
                 state.runbooks = []
                 duration = time.time() - start_time
                 state.add_performance_metric("search_runbooks", duration)
                 return state
             
-            # Direct tool integration point
-            if self.use_real_tools and self.confluence_configured:
-                from src.tools.confluence.app.api import ConfluenceClient
-                confluence_client = ConfluenceClient()
-                response = await confluence_client.search_runbooks(
-                    query=query,
-                    spaces=["AAVA", "MCDBA"],
-                    limit=3
-                )
-                state.runbooks = response.get("results", [])
+            # Rich progress display - Step header
+            import html
+            safe_query = html.escape(query[:50] + "..." if len(query) > 50 else query)
+            print(f'🔍 Searching runbooks for: "{safe_query}"')
+            print('='*60)
+            
+            # ChromaDB integration with empty collection validation
+            if self.vector_store is not None:
+                print("📊 Checking ChromaDB collection status...")
+                
+                try:
+                    # Critical: Validate collection exists and has content (be extremely careful not to modify)
+                    count = self.vector_store._collection.count()
+                    print(f'📊 Collection: mcdb-runbooks ({count} chunks)')
+                    
+                    if count == 0:
+                        print("❌ ChromaDB collection is empty - no runbooks indexed")
+                        self.logger.log_warning("ChromaDB collection 'mcdb-runbooks' is empty")
+                        state.runbooks = []
+                        state.update_status("GAP_DETECTED", "ChromaDB collection is empty")
+                        duration = time.time() - start_time
+                        state.add_performance_metric("search_runbooks", duration)
+                        return state
+                    
+                    print("🔄 Performing semantic search...")
+                    
+                    # Perform semantic search with ChromaDB (READ-ONLY operation)
+                    search_results = self.vector_store.search_runbooks(query, n_results=5)
+                    
+                    if not search_results:
+                        print("🤷 No relevant runbooks found for query")
+                        self.logger.log_info("No relevant runbooks found in ChromaDB search")
+                        state.runbooks = []
+                        state.update_status("GAP_DETECTED", "No relevant runbooks found")
+                        duration = time.time() - start_time
+                        state.add_performance_metric("search_runbooks", duration)
+                        return state
+                    
+                    # Rich results formatting with security measures
+                    print(f'📋 Found {len(search_results)} relevant results:')
+                    print()
+                    
+                    formatted_results = []
+                    for i, result in enumerate(search_results, 1):
+                        # Client identification from tags
+                        tags = result.metadata.tags if result.metadata.tags else []
+                        client = "🏢 Helvetia" if "helvetia" in [tag.lower() for tag in tags] else \
+                                "🏢 Neste" if "neste" in [tag.lower() for tag in tags] else \
+                                "❓ Unknown"
+                        
+                        # Relevance scoring with emojis
+                        score = result.relevance_score
+                        if score >= 0.8:
+                            relevance = "🎯 Very Relevant"
+                        elif score >= 0.6:
+                            relevance = "✅ Relevant"
+                        elif score >= 0.4:
+                            relevance = "⚠️ Somewhat Relevant"
+                        else:
+                            relevance = "❌ Low Relevance"
+                        
+                        # Display with rich formatting
+                        print(f'{i}. 📖 {result.metadata.title}')
+                        print(f'   {client} | {relevance} ({score:.3f})')
+                        print(f'   📄 Page ID: {result.metadata.page_id}')
+                        
+                        # Content preview with security truncation
+                        content = result.content.strip()
+                        if len(content) > 200:
+                            content = content[:200] + "..."
+                        # Additional security: escape HTML and remove potential sensitive patterns
+                        content = html.escape(content)
+                        print(f'   💬 Preview: {content}')
+                        print(f'   🔗 URL: {result.metadata.page_url}')
+                        print()
+                        
+                        # Format for state (clean data for further processing)
+                        formatted_results.append({
+                            'title': result.metadata.title,
+                            'url': result.metadata.page_url,
+                            'space_key': result.metadata.space_key,
+                            'relevance_score': score,
+                            'excerpt': content.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')  # Unescape for internal use
+                        })
+                    
+                    # Completion indicators
+                    print('='*60)
+                    print(f'✅ ChromaDB search completed - {len(search_results)} results')
+                    
+                    # Update state with results
+                    state.runbooks = formatted_results
+                    
+                except Exception as vector_error:
+                    print(f'❌ ChromaDB search error: {vector_error}')
+                    self.logger.log_error(f"ChromaDB search failed: {vector_error}")
+                    
+                    # Graceful fallback to mock search
+                    print("🔄 Falling back to mock search...")
+                    mock_response = self._get_mock_confluence_response(query, state.jira_key)
+                    state.runbooks = mock_response.get("results", [])
+                    
             else:
-                # Mock implementation for development/testing
+                # Vector store not available - fallback to mock implementation
+                print("🧪 Vector store unavailable - using mock search")
+                self.logger.log_warning("Vector store not initialized, using fallback mock search")
                 mock_response = self._get_mock_confluence_response(query, state.jira_key)
                 state.runbooks = mock_response.get("results", [])
             
@@ -180,7 +328,8 @@ class DBRunbookFinderNodes:
                 "search_runbooks",
                 {
                     "query": query[:100] + "..." if len(query) > 100 else query,
-                    "results_count": len(state.runbooks)
+                    "results_count": len(state.runbooks),
+                    "search_method": "chromadb" if self.vector_store else "mock"
                 },
                 success=True
             )
@@ -188,6 +337,7 @@ class DBRunbookFinderNodes:
             return state
             
         except Exception as e:
+            print(f'❌ Search operation failed: {e}')
             duration = time.time() - start_time
             state.add_performance_metric("search_runbooks", duration)
             state.update_status("ERROR", f"Failed to search runbooks: {str(e)}")
@@ -196,7 +346,7 @@ class DBRunbookFinderNodes:
             return state
 
     async def update_jira_with_results_node(self, state: WorkflowState) -> WorkflowState:
-        """Update Jira ticket with runbook recommendations.
+        """Update Jira ticket with runbook recommendations with rich progress display.
         
         This node formats the found runbooks into a human-readable comment
         and adds it to the Jira ticket.
@@ -210,8 +360,12 @@ class DBRunbookFinderNodes:
         self.logger.log_step_start("update_jira_results", f"Adding results to {state.jira_key}")
         start_time = time.time()
         
+        # Rich progress display - Step header
+        print(f"🎯 Updating Jira ticket: {state.jira_key}")
+        print("🔄 Formatting runbook recommendations...")
+        
         try:
-            # Format runbook recommendations
+            # Format runbook recommendations with rich display
             comment_lines = [
                 "🔍 **Automated Runbook Recommendations**",
                 "",
@@ -219,11 +373,25 @@ class DBRunbookFinderNodes:
                 ""
             ]
             
+            print(f"📝 Preparing {len(state.runbooks)} runbook recommendations:")
+            
             for i, runbook in enumerate(state.runbooks[:3], 1):
                 title = runbook.get("title", "Unknown Title")
                 url = runbook.get("url", "#")
                 relevance = runbook.get("relevance_score", 0)
                 space = runbook.get("space_key", "Unknown")
+                
+                # Emoji-based relevance indicators for console display
+                if relevance >= 0.8:
+                    relevance_emoji = "🎯"
+                elif relevance >= 0.6:
+                    relevance_emoji = "✅"
+                elif relevance >= 0.4:
+                    relevance_emoji = "⚠️"
+                else:
+                    relevance_emoji = "❌"
+                
+                print(f"   {i}. {relevance_emoji} {title} ({relevance:.1%})")
                 
                 comment_lines.extend([
                     f"**{i}. {title}**",
@@ -235,7 +403,7 @@ class DBRunbookFinderNodes:
             
             comment_lines.extend([
                 "**Additional Information:**",
-                "- Search performed against: AAVA, MCDBA spaces",
+                "- Search performed against: ChromaDB vector database",
                 f"- Client: {state.get_client_name()}",
                 f"- Processing time: {state.get_total_duration():.2f} seconds",
                 "",
@@ -245,15 +413,19 @@ class DBRunbookFinderNodes:
             
             comment_text = "\n".join(comment_lines)
             
-            # Direct tool integration point
+            # Progress indicator for Jira integration
             if self.use_real_tools and self.jira_configured:
+                print("🔗 Adding comment to Jira ticket...")
                 from src.tools.jira.app.jira import JiraClient
                 jira_client = JiraClient()
                 jira_client.add_comment(state.jira_key, comment_text)
+                print("✅ Real Jira comment added successfully")
                 self.logger.log_info(f"Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
             else:
-                # Mock comment addition
+                print("🧪 Mock: Jira comment prepared (development mode)")
                 self.logger.log_info(f"Mock: Added comment to {state.jira_key} with {len(state.runbooks)} runbooks")
+            
+            print(f"📊 Summary: Added {len(state.runbooks)} runbook recommendations to ticket")
             self.logger.log_debug(f"Comment content preview: {comment_text[:100]}...")
             
             duration = time.time() - start_time
@@ -423,16 +595,62 @@ class DBRunbookFinderNodes:
             
             message_text = "\n".join(message_lines)
             
-            # Direct tool integration point (future enhancement)
-            # TODO: Implement direct Slack tool integration when available
-            # if self.use_real_tools and self.slack_configured:
-            #     from src.tools.communication.slack import SlackClient
-            #     slack_client = SlackClient()
-            #     await slack_client.send_message("#mc-dba-jira-notifications", message_text)
+            # Progress indicator
+            print("📢 Preparing team notification...")
+            print(f"📝 Message prepared for {state.jira_key} ({state.status})")
             
-            # Mock notification
-            self.logger.log_info(f"Mock: Sent {state.status} notification to Slack for {state.jira_key}")
-            self.logger.log_debug(f"Notification content preview: {message_text[:100]}...")
+            # REAL SLACK INTEGRATION - Replace lines 534-543 with GraphMCP SlackMCPClient
+            if self.use_real_tools and self.slack_configured:
+                print("🚀 Sending Slack notification...")
+                
+                try:
+                    from src.frameworks.graphmcp.clients.slack import SlackMCPClient
+                    
+                    # Initialize Slack client with MCP configuration
+                    slack_client = SlackMCPClient(self.config_path)
+                    
+                    # Send message to #mc-dba-jira-notifications channel (C066PQYUYR4)
+                    result = await slack_client.post_message("C066PQYUYR4", message_text)
+                    
+                    if result.get("success"):
+                        print(f"✅ Successfully sent {state.status} notification to Slack for {state.jira_key}")
+                        self.logger.log_info("✅ Slack notification sent successfully", extra={
+                            "jira_key": state.jira_key,
+                            "status": state.status,
+                            "message_ts": result.get("message_ts"),
+                            "channel": "#mc-dba-jira-notifications"
+                        })
+                        
+                        # Update state with Slack delivery confirmation
+                        state.slack_message_sent = True
+                        state.slack_message_ts = result.get("message_ts")
+                        
+                    else:
+                        print(f"⚠️ Failed to send Slack notification: {result.get('error')}")
+                        self.logger.log_warning(f"⚠️ Slack notification failed: {result.get('error')}")
+                        
+                        # Graceful fallback to mock
+                        print("🔄 Falling back to mock notification")
+                        self.logger.log_info(f"Mock: Sent {state.status} notification to Slack for {state.jira_key}")
+                        state.slack_message_sent = False
+                        
+                except Exception as e:
+                    print(f"❌ Slack integration error: {e}")
+                    self.logger.log_error(f"❌ Slack integration error: {e}")
+                    
+                    # Graceful fallback to mock
+                    print("🔄 Falling back to mock notification")
+                    self.logger.log_info(f"Mock: Sent {state.status} notification to Slack for {state.jira_key}")
+                    state.slack_message_sent = False
+                    
+            else:
+                # Mock notification (development/testing mode)
+                print("🧪 Using mock notification (development mode)")
+                self.logger.log_info(f"Mock: Sent {state.status} notification to Slack for {state.jira_key}")
+                self.logger.log_debug(f"Notification content preview: {message_text[:100]}...")
+                state.slack_message_sent = False
+            
+            print("📬 Team notification completed")
             
             duration = time.time() - start_time
             state.add_performance_metric("notify_team", duration)

@@ -27,7 +27,7 @@ def main():
         collection = vs._collection
         count = collection.count()
         
-        print(f'📚 ChromaDB Collection: mcdb-runbooks')
+        print('📚 ChromaDB Collection: mcdb-runbooks')
         print(f'📊 Total chunks: {count}')
         print('='*60)
         

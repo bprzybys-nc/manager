@@ -100,7 +100,7 @@ def main():
                 
                 # Show supporting chunks in tree format
                 if hasattr(result, '_supporting_chunks') and result._supporting_chunks:
-                    print(f'   🧩 Supporting Evidence:')
+                    print('   🧩 Supporting Evidence:')
                     for j, chunk in enumerate(result._supporting_chunks[:3], 1):  # Show top 3
                         chunk_content = chunk['content'].strip()
                         if len(chunk_content) > 150:

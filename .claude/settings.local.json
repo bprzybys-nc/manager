@@ -201,7 +201,8 @@
       "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -m performance --timeout=30)",
       "Bash(PYTHONPATH=/Users/bprzybysz/nc-src/ovora/manager uv run pytest src/usecases/db_runbook_finder/tests/ -v --ignore=src/usecases/db_runbook_finder/tests/test_workflow.py --timeout=30)",
       "mcp__filesystem__search_files",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "mcp__git__git_status"
     ],
     "deny": [
       "Bash(rm -rf /:*)",

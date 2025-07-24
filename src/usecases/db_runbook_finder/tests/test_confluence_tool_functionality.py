@@ -9,9 +9,7 @@ and can be used for the runbook discovery system.
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any
 
-import pytest
 from dotenv import load_dotenv
 
 # Add manager src to path  
@@ -139,7 +137,7 @@ def test_confluence_connectivity():
             # Try to get a test page - using one of our target pages
             test_page_id = "4012343437"  # Helvetia page
             page_info = client.get_page_by_id(test_page_id)
-            print(f"✓ Successfully connected to Confluence")
+            print("✓ Successfully connected to Confluence")
             print(f"  Retrieved page: {page_info.get('title', 'Unknown')}")
             print(f"  Page ID: {page_info.get('id', 'Unknown')}")
             return True
@@ -213,7 +211,7 @@ def test_page_children_functionality():
         try:
             # Search for pages in MCDBA space
             results = client.search_pages("runbook", space_key="MCDBA", limit=5)
-            print(f"✓ Successfully searched for runbooks in MCDBA space")
+            print("✓ Successfully searched for runbooks in MCDBA space")
             print(f"  Found {len(results)} pages matching 'runbook'")
             
             # Show first few results

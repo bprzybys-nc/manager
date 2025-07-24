@@ -122,13 +122,13 @@ def mock_confluence_empty_response():
 @pytest.fixture
 def db_runbook_finder_nodes():
     """DB Runbook Finder nodes instance for testing."""
-    return DBRunbookFinderNodes()
+    return DBRunbookFinderNodes(use_real_tools=False)  # Ensure mock mode for tests
 
 
 @pytest.fixture
 def db_runbook_finder_workflow():
     """DB Runbook Finder workflow instance for testing."""
-    return DBRunbookFinderWorkflow()
+    return DBRunbookFinderWorkflow(use_real_tools=False)  # Ensure mock mode for tests
 
 
 @pytest.fixture

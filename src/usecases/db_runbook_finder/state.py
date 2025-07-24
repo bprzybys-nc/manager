@@ -26,6 +26,8 @@ class WorkflowState:
         created_at: Timestamp when workflow started
         updated_at: Timestamp of last state update
         performance_metrics: Timing and performance data
+        slack_message_sent: Whether Slack notification was successfully sent
+        slack_message_ts: Slack message timestamp for sent notifications
     """
     
     jira_key: str
@@ -36,6 +38,9 @@ class WorkflowState:
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     performance_metrics: Dict[str, float] = field(default_factory=dict)
+    # Slack integration tracking
+    slack_message_sent: bool = False
+    slack_message_ts: Optional[str] = None
 
     def __post_init__(self):
         """Initialize state after creation."""
@@ -142,7 +147,9 @@ class WorkflowState:
             "error_message": self.error_message,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "performance_metrics": self.performance_metrics
+            "performance_metrics": self.performance_metrics,
+            "slack_message_sent": self.slack_message_sent,
+            "slack_message_ts": self.slack_message_ts
         }
 
     @classmethod
@@ -167,7 +174,9 @@ class WorkflowState:
             error_message=data.get("error_message"),
             created_at=created_at,
             updated_at=updated_at,
-            performance_metrics=data.get("performance_metrics", {})
+            performance_metrics=data.get("performance_metrics", {}),
+            slack_message_sent=data.get("slack_message_sent", False),
+            slack_message_ts=data.get("slack_message_ts")
         )
 
     def __str__(self) -> str:

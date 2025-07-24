@@ -20,9 +20,16 @@ class DBRunbookFinderWorkflow:
     response time.
     """
     
-    def __init__(self):
-        """Initialize the workflow with direct node execution."""
-        self.nodes = DBRunbookFinderNodes()
+    def __init__(self, config_path: str = "src/frameworks/graphmcp/clients/mcp_config.json", use_real_tools: bool = False):
+        """Initialize the workflow with direct node execution.
+        
+        Args:
+            config_path: Path to MCP configuration file for GraphMCP client initialization
+            use_real_tools: Whether to use real tool integrations when available
+        """
+        self.config_path = config_path
+        self.use_real_tools = use_real_tools
+        self.nodes = DBRunbookFinderNodes(config_path=config_path, use_real_tools=use_real_tools)
         
         # Initialize logging
         self.logging_config = LoggingConfig.from_env()
@@ -168,7 +175,7 @@ class DBRunbookFinderWorkflow:
             
             # Check node initialization
             try:
-                DBRunbookFinderNodes()
+                DBRunbookFinderNodes(config_path=self.config_path, use_real_tools=self.use_real_tools)
                 validation_results["checks"]["nodes_initialization"] = "success"
             except Exception as e:
                 validation_results["checks"]["nodes_initialization"] = "failed"
