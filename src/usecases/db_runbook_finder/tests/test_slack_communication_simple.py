@@ -47,12 +47,12 @@ class TestSlackCommunicationSimple:
             {
                 "title": "DB2 Hotel - OS patching (DBA activities)",
                 "relevance": 0.282,
-                "url": "https://nordcloud.atlassian.net/spaces/MCDBA/pages/4355129622"
+                "url": "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4355129622"
             },
             {
                 "title": "Oracle Enterprise Manager Cloud Control monitoring", 
                 "relevance": 0.314,
-                "url": "https://nordcloud.atlassian.net/spaces/MCDBA/pages/4594270243"
+                "url": "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4594270243"
             }
         ]
         
@@ -158,11 +158,11 @@ Found 2 relevant runbooks:
 
 1. **DB2 Hotel - OS patching (DBA activities)**
    Relevance: 28.2%
-   🔗 https://nordcloud.atlassian.net/spaces/MCDBA/pages/4355129622
+   🔗 https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4355129622
 
 2. **Oracle Enterprise Manager Cloud Control monitoring**
    Relevance: 31.4%
-   🔗 https://nordcloud.atlassian.net/spaces/MCDBA/pages/4594270243
+   🔗 https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4594270243
 
 ✅ Runbook recommendations added to Jira ticket"""
         

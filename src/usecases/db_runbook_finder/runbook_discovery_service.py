@@ -13,7 +13,7 @@ from typing import Dict, List, Set
 
 from tools.confluence.app.confluence import ConfluenceClient
 from tools.confluence.app.vector_store import VectorStore
-from tools.confluence.app.models import RunbookContent, DiscoveryResult, PopulationResult
+from tools.confluence.app.models import RunbookContent, DiscoveryResult, PopulationResult, CollectionStats, ClearingResult
 
 
 logger = logging.getLogger(__name__)
@@ -399,3 +399,111 @@ class RunbookDiscoveryService:
         logger.info("=" * 60)
         
         return result
+    
+    async def get_collection_stats(self) -> CollectionStats:
+        """Get comprehensive collection statistics."""
+        try:
+            # Use vector store to get collection information
+            collection_info = self.vector_store.get_collection_info()
+            
+            if not collection_info.get("exists", False):
+                return CollectionStats(
+                    collection_name=self.collection_name,
+                    document_count=0,
+                    sample_documents=[]
+                )
+            
+            doc_count = collection_info.get("count", 0)
+            sample_docs = []
+            
+            # Get sample document titles if collection has content
+            if doc_count > 0:
+                try:
+                    # Query a few documents to show titles for confirmation
+                    sample_results = self.vector_store._collection.peek(limit=3)
+                    if sample_results and "metadatas" in sample_results:
+                        sample_docs = [
+                            metadata.get("title", "Unknown Title")
+                            for metadata in sample_results["metadatas"]
+                            if metadata
+                        ]
+                except Exception as e:
+                    logger.warning(f"Could not fetch sample documents: {e}")
+                    sample_docs = ["(Sample documents unavailable)"]
+            
+            return CollectionStats(
+                collection_name=self.collection_name,
+                document_count=doc_count,
+                sample_documents=sample_docs
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to get collection stats for '{self.collection_name}': {e}")
+            # Return empty stats rather than failing
+            return CollectionStats(
+                collection_name=self.collection_name,
+                document_count=0,
+                sample_documents=[]
+            )
+    
+    async def clear_collection(self, confirmation: bool = True) -> ClearingResult:
+        """
+        Clear existing ChromaDB collection with comprehensive error handling.
+        
+        Args:
+            confirmation: Whether user confirmation was obtained
+            
+        Returns:
+            ClearingResult with operation details and any errors
+        """
+        start_time = time.time()
+        
+        try:
+            # Get current stats for logging
+            stats = await self.get_collection_stats()
+            
+            if stats.document_count == 0:
+                logger.info(f"Collection '{self.collection_name}' is already empty")
+                return ClearingResult(
+                    success=True,
+                    collection_name=self.collection_name,
+                    documents_cleared=0,
+                    clearing_time=time.time() - start_time
+                )
+            
+            if not confirmation:
+                raise ValueError("User confirmation required to clear non-empty collection")
+            
+            # Perform the clearing operation
+            logger.info(f"Clearing ChromaDB collection '{self.collection_name}' with {stats.document_count} documents")
+            
+            cleared_count = await self.vector_store.clear_collection()
+            
+            # Reset processed pages cache since we're starting fresh
+            self._processed_pages.clear()
+            
+            clearing_time = time.time() - start_time
+            
+            result = ClearingResult(
+                success=True,
+                collection_name=self.collection_name,
+                documents_cleared=cleared_count,
+                clearing_time=clearing_time
+            )
+            
+            logger.info(f"Successfully cleared collection '{self.collection_name}': "
+                       f"{cleared_count} documents removed in {clearing_time:.2f}s")
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Failed to clear collection '{self.collection_name}': {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            
+            return ClearingResult(
+                success=False,
+                collection_name=self.collection_name,
+                documents_cleared=0,
+                clearing_time=time.time() - start_time,
+                error_message=error_msg
+            )

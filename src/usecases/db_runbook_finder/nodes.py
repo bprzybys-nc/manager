@@ -7,7 +7,7 @@ Jira tickets and find relevant runbooks through semantic search.
 
 import time
 from typing import Dict, Any, Optional
-from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
+from frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
 from .state import WorkflowState, MetricsFormatter
 

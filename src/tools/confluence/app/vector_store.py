@@ -12,9 +12,8 @@ from typing import List, Optional, Dict, Any
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
-import numpy as np
 
-from .models import RunbookContent, RunbookChunk, SearchResult
+from .models import RunbookContent, SearchResult
 
 
 logger = logging.getLogger(__name__)
@@ -848,3 +847,108 @@ class VectorStore:
             page_url=metadata_dict["page_url"],
             tags=metadata_dict["tags"].split(",") if metadata_dict["tags"] else [],
         )
+
+    async def clear_collection(self) -> int:
+        """
+        Safely clear all documents from the ChromaDB collection.
+        
+        Returns:
+            Number of documents that were cleared
+            
+        Raises:
+            Exception: If clearing operation fails with details
+        """
+        try:
+            # Check if collection exists and get document count
+            doc_count = 0
+            try:
+                doc_count = self._collection.count()
+            except Exception as e:
+                logger.warning(f"Could not get document count before clearing: {e}")
+                # Continue with clearing attempt anyway
+            
+            if doc_count == 0:
+                logger.info(f"Collection '{self.collection_name}' is already empty")
+                return 0
+            
+            logger.info(f"Clearing ChromaDB collection '{self.collection_name}' containing {doc_count} documents")
+            
+            # ChromaDB approach: Delete and recreate collection for complete clearing
+            # This ensures all metadata, embeddings, and indexes are fully reset
+            
+            # Store collection configuration before deletion
+            collection_metadata = getattr(self._collection, 'metadata', {})
+            
+            try:
+                # Delete existing collection
+                self._client.delete_collection(name=self.collection_name)
+                logger.debug(f"Deleted collection '{self.collection_name}'")
+                
+                # Recreate collection with same configuration
+                self._collection = self._client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata=collection_metadata or {"description": "Confluence runbook content chunks"}
+                )
+                logger.debug(f"Recreated collection '{self.collection_name}' with fresh state")
+                
+            except Exception as e:
+                logger.error(f"Failed to delete/recreate collection '{self.collection_name}': {e}")
+                # Attempt alternative clearing method
+                try:
+                    # Fallback: Get all IDs and delete them
+                    all_data = self._collection.get()
+                    if all_data and "ids" in all_data and all_data["ids"]:
+                        self._collection.delete(ids=all_data["ids"])
+                        logger.info(f"Used fallback deletion method for {len(all_data['ids'])} documents")
+                    else:
+                        logger.warning("No documents found with fallback method")
+                except Exception as fallback_error:
+                    logger.error(f"Fallback clearing method also failed: {fallback_error}")
+                    raise e  # Re-raise original error
+            
+            # Verify clearing was successful
+            final_count = self._collection.count()
+            if final_count > 0:
+                logger.warning(f"Collection clearing incomplete: {final_count} documents remain")
+            else:
+                logger.info(f"Successfully cleared collection '{self.collection_name}': {doc_count} documents removed")
+            
+            return doc_count
+            
+        except Exception as e:
+            error_msg = f"Failed to clear collection '{self.collection_name}': {str(e)}"
+            logger.error(error_msg)
+            raise Exception(error_msg) from e
+    
+    def get_collection_info(self) -> Dict[str, Any]:
+        """
+        Get comprehensive collection information for inspection.
+        
+        Returns:
+            Dictionary with collection metadata and statistics
+        """
+        try:
+            collection_info = {
+                "name": self.collection_name,
+                "exists": True,
+                "embedding_function": str(self._embedding_model)[:100],  # Truncate for readability
+            }
+            
+            try:
+                collection_info["count"] = self._collection.count()
+                collection_info["metadata"] = getattr(self._collection, 'metadata', {})
+                collection_info["embedding_dimension"] = self._embedding_dimension
+                collection_info["persist_directory"] = self.persist_directory
+            except Exception as e:
+                logger.warning(f"Could not get detailed collection info: {e}")
+                collection_info["count"] = -1
+                collection_info["error"] = str(e)
+            
+            return collection_info
+            
+        except Exception as e:
+            return {
+                "name": self.collection_name,
+                "exists": False,
+                "error": str(e)
+            }

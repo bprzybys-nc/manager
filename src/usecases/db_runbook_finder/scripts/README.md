@@ -22,7 +22,7 @@ uv run python src/usecases/db_runbook_finder/scripts/list_runbooks.py
  1. Access to Helvetia environment
     📄 Page ID: 4218814812
     🧩 Chunks: 3
-    🔗 URL: https://nordcloud.atlassian.net/spaces/MCDBA/pages/4218814812
+    🔗 URL: https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4218814812
 ```
 
 ### 2. `search_runbooks.py` - Semantic Search
@@ -50,7 +50,7 @@ uv run python src/usecases/db_runbook_finder/scripts/search_runbooks.py "onboard
    🏢 Helvetia | 🎯 Very Relevant (0.892)
    📄 Page ID: 4232807146
    💬 Content: This runbook provides step-by-step instructions for accessing Oracle database servers...
-   🔗 URL: https://nordcloud.atlassian.net/spaces/MCDBA/pages/4232807146
+   🔗 URL: https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4232807146
 ```
 
 ### 3. `collection_stats.py` - Detailed Analytics

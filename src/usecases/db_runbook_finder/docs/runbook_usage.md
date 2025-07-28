@@ -42,15 +42,21 @@ uv run python src/usecases/db_runbook_finder/scripts/collection_stats.py
 
 ### **Discovery and Population** (First-time setup)
 ```bash
-# Full discovery and populate ChromaDB
-uv run python -m usecases.db_runbook_finder.discover_runbooks --collection-name mcdb-runbooks
+  # Clear existing and repopulate
+  uv run python src/usecases/db_runbook_finder/discover_runbooks.py --clear-existing
+  --collection-name mcdb-runbooks
 
-# Dry run (discovery only, no ChromaDB population)
-uv run python -m usecases.db_runbook_finder.discover_runbooks --dry-run
+  # Dry run preview
+  uv run python src/usecases/db_runbook_finder/discover_runbooks.py --dry-run --clear-existing
 
-# Debug mode with verbose logging
-uv run python -m usecases.db_runbook_finder.discover_runbooks --log-level DEBUG --dry-run
+  # Automation friendly (multiple ways to skip confirmation)
+  uv run python src/usecases/db_runbook_finder/discover_runbooks.py --clear-existing --no-confirm
+  uv run python src/usecases/db_runbook_finder/discover_runbooks.py --clear-existing -y  
+  uv run python src/usecases/db_runbook_finder/discover_runbooks.py --clear-existing --yes
+  
 ```
+The implementation addresses the duplicate runbook issue by providing safe, reliable re-runs of
+the discovery script with proper collection management.
 
 ### **Workflow Integration** (Programmatic Usage)
 ```python

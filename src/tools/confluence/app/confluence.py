@@ -514,7 +514,7 @@ class ConfluenceClient:
                 last_modified = datetime.utcnow()
             
             # Construct page URL
-            page_url = f"{self.base_url}/spaces/{space_key}/pages/{page_id}"
+            page_url = f"{self.base_url}/wiki/spaces/{space_key}/pages/{page_id}"
             
             # Extract HTML content
             body_content = page_content.get('body', {})
