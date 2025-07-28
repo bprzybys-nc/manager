@@ -39,7 +39,9 @@ class RunbookDiscoveryService:
         # Root URLs for client-specific runbooks
         self.root_urls = [
             "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4012343437/Helvetia+Runbooks",
-            "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4322296000/Neste+Runbooks"
+            "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4322296000/Neste+Runbooks",
+            "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/4601217140/Grohe+Runbooks",
+            "https://nordcloud.atlassian.net/wiki/spaces/MCDBA/pages/3874423604/Bravida+Runbooks"
         ]
         
         # Runbook detection patterns based on screenshot analysis
