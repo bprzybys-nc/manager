@@ -340,3 +340,62 @@ class PopulationResult(BaseModel):
     populated_runbook_ids: List[str] = Field(default_factory=list, description="IDs of successfully populated runbooks")
     errors: List[str] = Field(default_factory=list, description="Population error messages")
     deduplication_stats: Dict[str, int] = Field(default_factory=dict, description="Deduplication statistics")
+
+
+class CollectionStats(BaseModel):
+    """Statistics for ChromaDB collection before clearing."""
+    
+    collection_name: str = Field(..., min_length=1, description="Name of the collection")
+    document_count: int = Field(..., ge=0, description="Number of documents in the collection")
+    last_modified: Optional[datetime] = Field(None, description="Last modification timestamp")
+    size_bytes: Optional[int] = Field(None, ge=0, description="Collection size in bytes")
+    sample_documents: List[str] = Field(default_factory=list, description="First few document titles for confirmation")
+    
+    @validator('sample_documents')
+    def validate_sample_documents(cls, v):
+        """Validate sample documents list."""
+        if len(v) > 10:
+            raise ValueError('Maximum 10 sample documents allowed')
+        for doc in v:
+            if not isinstance(doc, str):
+                raise ValueError('Sample documents must be strings')
+            if len(doc) > 200:
+                raise ValueError('Sample document title cannot exceed 200 characters')
+        return v
+
+
+class ClearingResult(BaseModel):
+    """Result of collection clearing operation."""
+    
+    success: bool = Field(..., description="Whether the clearing operation was successful")
+    collection_name: str = Field(..., min_length=1, description="Name of the collection that was cleared")
+    documents_cleared: int = Field(..., ge=0, description="Number of documents that were cleared")
+    clearing_time: float = Field(..., ge=0, description="Time taken for the clearing operation in seconds")
+    error_message: Optional[str] = Field(None, description="Error message if clearing failed")
+    rollback_available: bool = Field(default=False, description="Whether rollback is available")
+    
+    @validator('error_message')
+    def validate_error_message(cls, v):
+        """Validate error message."""
+        if v is not None and len(v.strip()) == 0:
+            raise ValueError('Error message cannot be empty string')
+        return v
+
+
+class DiscoveryOptions(BaseModel):
+    """Configuration options for discovery operations."""
+    
+    collection_name: str = Field(..., min_length=1, max_length=100, description="ChromaDB collection name")
+    dry_run: bool = Field(default=False, description="Whether to run in dry-run mode")
+    clear_existing: bool = Field(default=False, description="Whether to clear existing collection data")
+    max_depth: int = Field(default=3, ge=1, le=10, description="Maximum crawling depth")
+    confirmation_required: bool = Field(default=True, description="Whether confirmation is required for destructive operations")
+    
+    def validate(self) -> List[str]:
+        """Validate discovery options and return any errors."""
+        errors = []
+        if self.clear_existing and not self.collection_name:
+            errors.append("Collection name required when clearing existing data")
+        if self.max_depth > 5 and not self.dry_run:
+            errors.append("Max depth > 5 requires dry-run mode for safety")
+        return errors

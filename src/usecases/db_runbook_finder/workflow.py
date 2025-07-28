@@ -6,7 +6,7 @@ using the GraphMCP framework and LangGraph state management.
 """
 
 from typing import Dict, Any
-from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
+from frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
 from .state import WorkflowState
 from .nodes import DBRunbookFinderNodes

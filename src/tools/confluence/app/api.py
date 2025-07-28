@@ -593,7 +593,7 @@ async def search_confluence_pages(
                 "title": page.get("title", ""),
                 "space_key": page.get("space", {}).get("key", ""),
                 "space_name": page.get("space", {}).get("name", ""),
-                "url": f"{confluence_client.base_url}/spaces/{page.get('space', {}).get('key', '')}/pages/{page.get('id', '')}",
+                "url": f"{confluence_client.base_url}/wiki/spaces/{page.get('space', {}).get('key', '')}/pages/{page.get('id', '')}",
                 "last_modified": page.get("version", {}).get("when", ""),
                 "author": page.get("version", {}).get("by", {}).get("displayName", "")
             })
