@@ -191,6 +191,18 @@ Examples:
         help='Skip confirmation prompts for automation (use with caution)'
     )
     
+    parser.add_argument(
+        '--clear-existing',
+        action='store_true',
+        help='Clear existing ChromaDB collection before discovery (requires confirmation unless --no-confirm)'
+    )
+    
+    parser.add_argument(
+        '--no-confirm', '-y', '--yes',
+        action='store_true',
+        help='Skip confirmation prompts for automation (use with caution)'
+    )
+    
     args = parser.parse_args()
     
     # Setup logging
