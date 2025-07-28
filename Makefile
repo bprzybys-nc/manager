@@ -2,7 +2,7 @@
 # Comprehensive build, test, and deployment automation for SysAIdmin Manager
 
 .PHONY: help install-uv clean setup setup-dev
-.PHONY: test-all test-manager test-graphmcp test-dbdecommission
+.PHONY: test-all test-manager test-graphmcp test-dbdecommission test-dbrunbook
 .PHONY: test-unit test-integration test-e2e
 .PHONY: lint format check-deps
 .PHONY: run-manager run-worker run-slack run-api
@@ -21,6 +21,7 @@ TEST_PATH := tests
 MANAGER_PORT := 9123
 GRAPHMCP_PATH := src/frameworks/graphmcp
 DB_DECOMMISSION_PATH := src/usecases/database_decommissioning
+DB_RUNBOOK_PATH := src/usecases/db_runbook_finder
 
 # Colors for output
 RED := \033[0;31m
@@ -38,7 +39,7 @@ help: ## Show this help message
 	@echo "$(GREEN)🚀 Quick Start:$(NC)"
 	@echo "  make setup         - Setup development environment"
 	@echo "  make setup-dev     - Setup development environment + dev tools"
-	@echo "  make test-all      - Run all tests (Manager + GraphMCP + DB Decommission)"
+	@echo "  make test-all      - Run all tests (Manager + GraphMCP + DB Decommission + DB Runbook)"
 	@echo "  make run-manager   - Start Manager API server"
 	@echo ""
 	@echo "$(GREEN)📦 Development:$(NC)"
@@ -51,6 +52,7 @@ help: ## Show this help message
 	@echo "  make test-manager      - Manager core tests"
 	@echo "  make test-graphmcp     - GraphMCP framework tests"
 	@echo "  make test-dbdecommission - Database decommissioning tests"
+	@echo "  make test-dbrunbook    - DB Runbook Finder tests"
 	@echo "  make test-unit         - All unit tests"
 	@echo "  make test-integration  - All integration tests"
 	@echo "  make test-e2e          - All end-to-end tests"
@@ -106,6 +108,10 @@ clean: ## Clean build artifacts, cache, and virtual environment
 	rm -rf $(DB_DECOMMISSION_PATH)/.pytest_cache/
 	rm -rf $(DB_DECOMMISSION_PATH)/htmlcov/
 	rm -rf $(DB_DECOMMISSION_PATH)/.venv/
+	# Clean DB Runbook artifacts  
+	rm -rf $(DB_RUNBOOK_PATH)/.pytest_cache/
+	rm -rf $(DB_RUNBOOK_PATH)/htmlcov/
+	rm -rf $(DB_RUNBOOK_PATH)/chroma/
 	@echo "$(GREEN)✓ Cleanup complete$(NC)"
 
 setup: install-uv clean ## Setup development environment with dependencies
@@ -122,17 +128,8 @@ setup: install-uv clean ## Setup development environment with dependencies
 
 setup-dev: setup ## Setup development environment with dev tools
 	@echo "$(YELLOW)Installing development tools...$(NC)"
-	uv add --dev \
-		pytest>=7.4.0 \
-		pytest-asyncio>=0.21.0 \
-		pytest-mock>=3.11.0 \
-		pytest-cov>=4.1.0 \
-		pytest-xdist>=3.3.0 \
-		black>=23.0.0 \
-		ruff>=0.1.0 \
-		mypy>=1.5.0 \
-		pre-commit>=3.4.0 \
-		hypothesis>=6.82.0
+	@echo "$(BLUE)Installing development dependencies from dependency groups...$(NC)"
+	uv sync --group dev
 	@echo "$(BLUE)Setting up pre-commit hooks...$(NC)"
 	uv run pre-commit install
 	@echo "$(GREEN)✓ Development environment with tools ready$(NC)"
@@ -150,6 +147,10 @@ check-deps: ## Check if dependencies are installed
 	@if [ ! -d "$(DB_DECOMMISSION_PATH)/.venv" ]; then \
 		echo "$(YELLOW)⚠ DB Decommission environment not found. Setting up...$(NC)"; \
 		cd $(DB_DECOMMISSION_PATH) && uv sync; \
+	fi
+	@echo "$(BLUE)Checking DB Runbook dependencies...$(NC)"
+	@if [ ! -d "$(DB_RUNBOOK_PATH)/tests" ]; then \
+		echo "$(YELLOW)⚠ DB Runbook tests directory not found$(NC)"; \
 	fi
 	@echo "$(GREEN)✓ Dependencies OK$(NC)"
 
@@ -217,6 +218,18 @@ test-dbdecommission: check-deps ## Run database decommissioning tests
 		-m "unit" || echo "$(YELLOW)⚠ Some DB decommission tests may need MCP setup$(NC)"
 	@echo "$(GREEN)✓ Database Decommissioning tests completed$(NC)"
 
+test-dbrunbook: check-deps ## Run DB Runbook Finder tests
+	@echo "$(YELLOW)Running DB Runbook Finder tests...$(NC)"
+	@echo "$(BLUE)Running use case tests...$(NC)"
+	cd $(DB_RUNBOOK_PATH) && uv run pytest tests/ \
+		--verbose \
+		--cov=. \
+		--cov-report=term-missing \
+		--cov-report=html:htmlcov/dbrunbook \
+		--junit-xml=test-results-dbrunbook.xml \
+		--tb=short || echo "$(YELLOW)⚠ Some DB runbook tests may need ChromaDB setup$(NC)"
+	@echo "$(GREEN)✓ DB Runbook Finder tests completed$(NC)"
+
 test-unit: check-deps ## Run all unit tests
 	@echo "$(YELLOW)Running all unit tests...$(NC)"
 	@echo "$(BLUE)Manager unit tests...$(NC)"
@@ -225,6 +238,8 @@ test-unit: check-deps ## Run all unit tests
 	cd $(GRAPHMCP_PATH) && make test-unit || echo "$(YELLOW)⚠ GraphMCP unit tests$(NC)"
 	@echo "$(BLUE)DB Decommission unit tests...$(NC)"
 	cd $(DB_DECOMMISSION_PATH) && uv run pytest tests/unit/ -m "unit" --tb=short || echo "$(YELLOW)⚠ DB Decommission unit tests$(NC)"
+	@echo "$(BLUE)DB Runbook unit tests...$(NC)"
+	cd $(DB_RUNBOOK_PATH) && uv run pytest tests/ -m "unit or not (integration or e2e)" --tb=short || echo "$(YELLOW)⚠ DB Runbook unit tests$(NC)"
 	@echo "$(GREEN)✓ All unit tests completed$(NC)"
 
 test-integration: check-deps ## Run all integration tests
@@ -235,6 +250,8 @@ test-integration: check-deps ## Run all integration tests
 	cd $(GRAPHMCP_PATH) && make test-integration || echo "$(YELLOW)⚠ GraphMCP integration tests$(NC)"
 	@echo "$(BLUE)DB Decommission integration tests...$(NC)"
 	cd $(DB_DECOMMISSION_PATH) && uv run pytest tests/integration/ -m "integration" --tb=short || echo "$(YELLOW)⚠ DB Decommission integration tests$(NC)"
+	@echo "$(BLUE)DB Runbook integration tests...$(NC)"
+	cd $(DB_RUNBOOK_PATH) && uv run pytest tests/ -m "integration" --tb=short || echo "$(YELLOW)⚠ DB Runbook integration tests$(NC)"
 	@echo "$(GREEN)✓ All integration tests completed$(NC)"
 
 test-e2e: check-deps ## Run all end-to-end tests
@@ -245,7 +262,7 @@ test-e2e: check-deps ## Run all end-to-end tests
 	cd $(GRAPHMCP_PATH) && make test-e2e || echo "$(YELLOW)⚠ GraphMCP E2E tests$(NC)"
 	@echo "$(GREEN)✓ All E2E tests completed$(NC)"
 
-test-all: test-manager test-graphmcp test-dbdecommission ## Run all test suites
+test-all: test-manager test-graphmcp test-dbdecommission test-dbrunbook ## Run all test suites
 	@echo "$(GREEN)✓ All tests completed$(NC)"
 
 # =============================================================================
@@ -326,6 +343,7 @@ show-config: ## Show current configuration and environment
 	@echo "Manager Env: $$(if [ -d "$(VENV_PATH)" ]; then echo "✓"; else echo "✗"; fi)"
 	@echo "GraphMCP Env: $$(if [ -d "$(GRAPHMCP_PATH)/.venv" ]; then echo "✓"; else echo "✗"; fi)"
 	@echo "DB Decommission Env: $$(if [ -d "$(DB_DECOMMISSION_PATH)/.venv" ]; then echo "✓"; else echo "✗"; fi)"
+	@echo "DB Runbook Tests: $$(if [ -d "$(DB_RUNBOOK_PATH)/tests" ]; then echo "✓"; else echo "✗"; fi)"
 	@echo ""
 	@echo "$(YELLOW)Environment Variables:$(NC)"
 	@echo "GitHub Token: $$(if [ -n "$(GITHUB_TOKEN)" ]; then echo "✓ Set"; else echo "✗ Missing"; fi)"

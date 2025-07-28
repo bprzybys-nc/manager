@@ -25,16 +25,18 @@ class RunbookDiscoveryService:
     and populating ChromaDB for semantic search.
     """
     
-    def __init__(self, collection_name: str = "mcdb-runbooks"):
+    def __init__(self, collection_name: str = "mcdb-runbooks", max_depth: int = 5):
         """
         Initialize the RunbookDiscoveryService.
         
         Args:
             collection_name: ChromaDB collection name (defaults to 'mcdb-runbooks')
+            max_depth: Maximum traversal depth for hierarchical discovery (defaults to 5)
         """
         self.confluence_client = ConfluenceClient()  # Uses .env credentials
         self.vector_store = VectorStore(collection_name=collection_name)
         self.collection_name = collection_name
+        self.max_depth = max_depth
         
         # Root URLs for client-specific runbooks
         self.root_urls = [
@@ -331,7 +333,7 @@ class RunbookDiscoveryService:
             try:
                 logger.info(f"Processing {client_name.title()} runbooks from: {root_url}")
                 
-                client_runbooks = self.discover_runbooks_from_root(root_url)
+                client_runbooks = self.discover_runbooks_from_root(root_url, max_depth=self.max_depth)
                 client_count = len(client_runbooks)
                 
                 all_discovered_runbooks.extend(client_runbooks)

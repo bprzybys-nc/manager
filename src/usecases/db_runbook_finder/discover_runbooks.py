@@ -175,8 +175,8 @@ Examples:
     parser.add_argument(
         '--max-depth',
         type=int,
-        default=3,
-        help='Maximum traversal depth for hierarchical discovery (default: 3)'
+        default=5,
+        help='Maximum traversal depth for hierarchical discovery (default: 5)'
     )
     
     parser.add_argument(
@@ -209,7 +209,8 @@ Examples:
         # Initialize discovery service
         service = RunbookDiscoveryService(collection_name=args.collection_name)
         
-        # Override max depth if provided (would need to modify service to support this)
+        # Set max depth for discovery
+        service.max_depth = args.max_depth
         logger.info(f"Using max traversal depth: {args.max_depth}")
         
         # Handle clearing if requested
