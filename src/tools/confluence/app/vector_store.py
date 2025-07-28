@@ -380,10 +380,15 @@ class VectorStore:
                     # But ChromaDB might use squared distance, so we need to handle larger values
                     if distance > 2.0:
                         # If distance > 2, likely using squared cosine or different metric
-                        similarity_score = max(0.0, 1.0 / (1.0 + distance))
+                        raw_similarity = max(0.0, 1.0 / (1.0 + distance))
                     else:
                         # Standard cosine distance conversion
-                        similarity_score = max(0.0, 1.0 - (distance / 2.0))
+                        raw_similarity = max(0.0, 1.0 - (distance / 2.0))
+                    
+                    # Apply research-based relevance enhancement
+                    similarity_score = self._enhance_relevance_score(
+                        query.strip(), document, raw_similarity
+                    )
 
                     if runbook_id not in runbook_aggregates:
                         runbook_aggregates[runbook_id] = {
@@ -776,6 +781,50 @@ class VectorStore:
         except Exception as e:
             logger.error(f"Vector database health check failed: {e}")
             return False
+
+    def _enhance_relevance_score(self, query: str, content: str, base_score: float) -> float:
+        """
+        Research-based relevance score enhancement.
+        
+        Based on ChromaDB best practices:
+        - 0.7+ = High relevance
+        - 0.5-0.7 = Moderate relevance  
+        - <0.5 = Low relevance
+        
+        Enhancement strategies:
+        1. Keyword overlap boosting for database terms
+        2. Domain-specific terminology recognition
+        
+        Args:
+            query: User search query
+            content: Document content
+            base_score: Original ChromaDB cosine similarity score
+            
+        Returns:
+            Enhanced relevance score (0.0-1.0)
+        """
+        # Domain-specific keyword boosting
+        db_keywords = [
+            "database", "connection", "timeout", "performance", "backup", "recovery",
+            "sql", "query", "index", "table", "schema", "migration", "replication",
+            "monitoring", "troubleshooting", "optimization", "tuning", "memory",
+            "disk", "storage", "maintenance", "patch", "upgrade", "configuration"
+        ]
+        
+        query_lower = query.lower()
+        content_lower = content.lower()
+        
+        # Count keyword matches between query and content
+        keyword_matches = sum(1 for keyword in db_keywords 
+                            if keyword in query_lower and keyword in content_lower)
+        
+        # Apply keyword boost (5% per matching keyword, max 20%)
+        keyword_boost = min(keyword_matches * 0.05, 0.20)
+        
+        # Enhanced score with boosting
+        enhanced_score = min(base_score + keyword_boost, 1.0)
+        
+        return enhanced_score
 
     def _metadata_dict_to_runbook_metadata(self, metadata_dict: Dict[str, Any]):
         """

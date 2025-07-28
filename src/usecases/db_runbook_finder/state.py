@@ -10,6 +10,27 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, UTC
 
 
+class MetricsFormatter:
+    """Centralized metrics formatting for professional presentation."""
+    
+    @staticmethod
+    def format_duration(seconds: float) -> str:
+        """Format duration with 2 decimal precision and appropriate units."""
+        if seconds < 1.0:
+            return f"{seconds * 1000:.0f}ms"
+        return f"{seconds:.2f}s"
+    
+    @staticmethod
+    def format_percentage(score: float) -> str:
+        """Format percentage with 1 decimal precision."""
+        return f"{score * 100:.1f}%"
+    
+    @staticmethod
+    def format_metric(value: float, unit: str) -> str:
+        """Format metric with 2 decimal precision."""
+        return f"{value:.2f}{unit}"
+
+
 @dataclass
 class WorkflowState:
     """State management for DB Runbook Finder workflow.
@@ -116,6 +137,24 @@ class WorkflowState:
             Total duration in seconds
         """
         return sum(self.performance_metrics.values())
+
+    def get_formatted_duration(self) -> str:
+        """Get professionally formatted total duration."""
+        return MetricsFormatter.format_duration(self.get_total_duration())
+    
+    def get_formatted_processing_time(self) -> str:
+        """Get formatted processing time for display."""
+        processing_time = getattr(self, 'processing_time', 0.0)
+        return MetricsFormatter.format_duration(processing_time)
+    
+    def get_metrics_summary(self) -> Dict[str, str]:
+        """Get all metrics with consistent formatting."""
+        return {
+            "total_duration": self.get_formatted_duration(),
+            "processing_time": self.get_formatted_processing_time(),
+            "runbooks_found": str(len(self.runbooks)),
+            "status": self.status
+        }
 
     def is_error_state(self) -> bool:
         """Check if workflow is in error state.

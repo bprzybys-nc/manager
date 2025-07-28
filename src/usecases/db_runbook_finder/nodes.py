@@ -9,7 +9,7 @@ import time
 from typing import Dict, Any, Optional
 from src.frameworks.graphmcp.graphmcp_logging import get_logger, LoggingConfig
 
-from .state import WorkflowState
+from .state import WorkflowState, MetricsFormatter
 
 
 class DBRunbookFinderNodes:
@@ -165,6 +165,7 @@ class DBRunbookFinderNodes:
             duration = time.time() - start_time
             state.add_performance_metric("fetch_incident", duration)
             
+            print(f"   ⏱️ Processing Time: {MetricsFormatter.format_duration(duration)}")
             print("="*50)
             
             self.logger.log_step_end(
@@ -276,7 +277,7 @@ class DBRunbookFinderNodes:
                         
                         # Display with rich formatting
                         print(f'{i}. 📖 {result.metadata.title}')
-                        print(f'   {client} | {relevance} ({score:.3f})')
+                        print(f'   {client} | {relevance} ({MetricsFormatter.format_percentage(score)})')
                         print(f'   📄 Page ID: {result.metadata.page_id}')
                         
                         # Content preview with security truncation
@@ -391,11 +392,11 @@ class DBRunbookFinderNodes:
                 else:
                     relevance_emoji = "❌"
                 
-                print(f"   {i}. {relevance_emoji} {title} ({relevance:.1%})")
+                print(f"   {i}. {relevance_emoji} {title} ({MetricsFormatter.format_percentage(relevance)})")
                 
                 comment_lines.extend([
                     f"**{i}. {title}**",
-                    f"   📊 Relevance: {relevance:.1%}",
+                    f"   📊 Relevance: {MetricsFormatter.format_percentage(relevance)}",
                     f"   📚 Space: {space}",
                     f"   🔗 Link: {url}",
                     ""
@@ -405,7 +406,7 @@ class DBRunbookFinderNodes:
                 "**Additional Information:**",
                 "- Search performed against: ChromaDB vector database",
                 f"- Client: {state.get_client_name()}",
-                f"- Processing time: {state.get_total_duration():.2f} seconds",
+                f"- Processing time: {state.get_formatted_duration()}",
                 "",
                 "---",
                 "*This recommendation was generated automatically by the DB Runbook Finder.*"
@@ -489,7 +490,7 @@ class DBRunbookFinderNodes:
                 "**Search Details:**",
                 "- Searched spaces: AAVA, MCDBA",
                 f"- Query used: {state.get_search_query()[:200]}{'...' if len(state.get_search_query()) > 200 else ''}",
-                f"- Processing time: {state.get_total_duration():.2f} seconds",
+                f"- Processing time: {state.get_formatted_duration()}",
                 "",
                 "---",
                 "*Gap detection performed automatically by DB Runbook Finder.*"
@@ -558,7 +559,7 @@ class DBRunbookFinderNodes:
                     f"**Incident:** {safe_summary}{'...' if len(state.get_incident_summary()) > 100 else ''}",
                     f"**Client:** {safe_client}",
                     f"**Runbooks Found:** {len(state.runbooks)}",
-                    f"**Processing Time:** {state.get_total_duration():.2f} seconds",
+                    f"**Processing Time:** {state.get_formatted_duration()}",
                     "",
                     "**Top Recommendations:**"
                 ]
@@ -566,7 +567,7 @@ class DBRunbookFinderNodes:
                 for i, runbook in enumerate(state.runbooks[:2], 1):
                     title = html.escape(runbook.get("title", "Unknown Title"))
                     relevance = runbook.get("relevance_score", 0)
-                    message_lines.append(f"{i}. {title} ({relevance:.1%} relevance)")
+                    message_lines.append(f"{i}. {title} ({MetricsFormatter.format_percentage(relevance)} relevance)")
                 
                 message_lines.extend([
                     "",
@@ -583,7 +584,7 @@ class DBRunbookFinderNodes:
                     "",
                     f"**Incident:** {safe_summary}{'...' if len(state.get_incident_summary()) > 100 else ''}",
                     f"**Client:** {safe_client}",
-                    f"**Processing Time:** {state.get_total_duration():.2f} seconds",
+                    f"**Processing Time:** {state.get_formatted_duration()}",
                     "",
                     "No relevant runbooks found. Manual intervention required.",
                     "Consider creating new runbook for this incident type.",
@@ -599,7 +600,7 @@ class DBRunbookFinderNodes:
                     f"❌ **Workflow Error** - {state.jira_key}",
                     "",
                     f"**Error:** {safe_error}{'...' if state.error_message and len(state.error_message) > 200 else ''}",
-                    f"**Processing Time:** {state.get_total_duration():.2f} seconds",
+                    f"**Processing Time:** {state.get_formatted_duration()}",
                     "",
                     "Please check logs for detailed error information.",
                     "",
@@ -647,6 +648,18 @@ class DBRunbookFinderNodes:
                         task_db=task_db
                     )
                     
+                    # Create plain text summary for accessibility compliance
+                    # Note: plain_text_summary would be used in future Slack client update
+                    # plain_text_summary = self._create_accessible_summary(state)
+                    
+                    # SLACK API COMPLIANCE: For full accessibility compliance, the underlying
+                    # Slack client should be updated to include the 'text' parameter alongside
+                    # 'markdown_text' in chat_postMessage calls. This ensures:
+                    # 1. Screen reader compatibility
+                    # 2. Push notification support on mobile devices
+                    # 3. Fallback text when rich formatting fails
+                    # The plain_text_summary above provides the accessible content.
+                    
                     # Send message as new thread to #mc-dba-jira-notifications
                     thread_id = slack_client.create_thread(message_text)
                     
@@ -664,8 +677,8 @@ class DBRunbookFinderNodes:
                         state.slack_message_ts = thread_id
                         
                     else:
-                        print(f"⚠️ Failed to send Slack notification: No thread ID returned")
-                        self.logger.log_warning(f"⚠️ Slack notification failed: No thread ID returned")
+                        print("⚠️ Failed to send Slack notification: No thread ID returned")
+                        self.logger.log_warning("⚠️ Slack notification failed: No thread ID returned")
                         
                         # Graceful fallback to mock
                         print("🔄 Falling back to mock notification")
@@ -754,6 +767,22 @@ class DBRunbookFinderNodes:
                 "labels": ["test", "mock"]
             }
         })
+
+    def _create_accessible_summary(self, state: WorkflowState) -> str:
+        """Create plain text summary for screen readers and push notifications.
+        
+        Args:
+            state: Current workflow state
+            
+        Returns:
+            Plain text summary suitable for accessibility
+        """
+        if state.status == "SUCCESS":
+            return f"Runbook Recommendations Found - {state.jira_key}: {len(state.runbooks)} recommendations found"
+        elif state.status == "GAP_DETECTED":
+            return f"Runbook Gap Detected - {state.jira_key}: No relevant runbooks found, manual intervention required"
+        else:
+            return f"Workflow Error - {state.jira_key}: Please check logs for details"
 
     def _get_mock_confluence_response(self, query: str, jira_key: str) -> Dict[str, Any]:
         """Generate mock Confluence search response.
