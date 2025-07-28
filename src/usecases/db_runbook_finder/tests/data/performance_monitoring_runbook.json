@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "title": "Database Performance Monitoring and Optimization",
+    "space_key": "RUNBOOKS", 
+    "page_id": "234567",
+    "url": "https://company.atlassian.net/wiki/spaces/RUNBOOKS/pages/234567",
+    "created_at": "2024-01-10T09:15:00Z",
+    "updated_at": "2024-01-25T16:20:00Z",
+    "tags": ["database", "performance", "monitoring", "optimization", "slow queries", "indexing"]
+  },
+  "procedures": [
+    {
+      "step": 1,
+      "description": "Monitor current database performance metrics",
+      "command": "SELECT * FROM pg_stat_activity WHERE state = 'active';",
+      "expected_result": "List of currently running queries and their execution time"
+    },
+    {
+      "step": 2,
+      "description": "Identify slow running queries",
+      "command": "SELECT query, mean_time, calls FROM pg_stat_statements ORDER BY mean_time DESC LIMIT 10;",
+      "expected_result": "Top 10 slowest queries by average execution time"
+    },
+    {
+      "step": 3,
+      "description": "Check database lock status",
+      "command": "SELECT * FROM pg_locks WHERE NOT granted;",
+      "expected_result": "Any blocking locks that might cause performance issues"
+    },
+    {
+      "step": 4,
+      "description": "Analyze table statistics and index usage",
+      "command": "SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;",
+      "expected_result": "Unused indexes that might need optimization"
+    }
+  ],
+  "troubleshooting_steps": [
+    {
+      "symptom": "High CPU usage on database server",
+      "possible_causes": ["Inefficient queries", "Missing indexes", "Table scans"],
+      "resolution": "Optimize queries, add appropriate indexes, update table statistics"
+    },
+    {
+      "symptom": "Slow query response times",
+      "possible_causes": ["Missing indexes", "Large result sets", "Inefficient joins"],
+      "resolution": "Create indexes on frequently queried columns, limit result sets, optimize join conditions"
+    },
+    {
+      "symptom": "Database locks and blocking",
+      "possible_causes": ["Long-running transactions", "Deadlocks", "Lock escalation"],
+      "resolution": "Optimize transaction scope, implement retry logic, analyze deadlock graphs"
+    }
+  ],
+  "prerequisites": [
+    "Database monitoring tools access",
+    "Query execution permissions",
+    "Performance schema enabled",
+    "Monitoring dashboard access"
+  ],
+  "raw_content": "# Database Performance Monitoring\n\nThis runbook covers systematic approaches to monitoring and optimizing database performance in production environments.\n\n## Key Performance Indicators\n- Query execution time\n- CPU and memory usage\n- I/O throughput\n- Connection pool utilization\n- Lock contention metrics\n\n## Monitoring Tools\n- pg_stat_statements for PostgreSQL\n- Performance Schema for MySQL\n- Custom monitoring dashboards\n- Application performance monitoring (APM) tools\n\n## Optimization Strategies\nSystematic approach to identifying and resolving performance bottlenecks.",
+  "structured_sections": {
+    "overview": "Database performance monitoring and optimization procedures",
+    "scope": "Production database environments",
+    "severity": "High - impacts user experience",
+    "estimated_time": "30-60 minutes"
+  }
+}

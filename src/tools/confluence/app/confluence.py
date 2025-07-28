@@ -59,7 +59,7 @@ class ConfluenceClient:
     def _make_request(self, method: str, endpoint: str, params: Optional[Dict] = None, 
                      data: Optional[Dict] = None) -> Dict[str, Any]:
         """Make HTTP request to Confluence API with error handling and retries."""
-        url = f"{self.base_url}/rest/api{endpoint}"
+        url = f"{self.base_url}/wiki/rest/api{endpoint}"
         
         try:
             logger.debug(
@@ -263,6 +263,36 @@ class ConfluenceClient:
             return response.get('results', [])
             
         except ConfluenceAPIError:
+            raise
+    
+    def get_page_children(self, page_id: str) -> List[Dict[str, Any]]:
+        """
+        Get child pages of a Confluence page.
+        
+        Args:
+            page_id: The ID of the parent page
+            
+        Returns:
+            List of child page dictionaries
+            
+        Raises:
+            ConfluenceAPIError: If page not found or API error occurs
+        """
+        if not page_id or not page_id.strip():
+            raise ValueError("Page ID cannot be empty")
+        
+        endpoint = f"/content/{page_id}/child/page"
+        params = {
+            'expand': 'space,version',
+            'limit': 200  # Get more children if needed
+        }
+        
+        try:
+            response = self._make_request('GET', endpoint, params=params)
+            return response.get('results', [])
+        except ConfluenceAPIError as e:
+            if e.status_code == 404:
+                raise ConfluenceAPIError(f"Page with ID '{page_id}' not found", status_code=404)
             raise
     
     def _clean_html_content(self, html: str) -> str:

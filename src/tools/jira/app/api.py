@@ -45,6 +45,15 @@ async def add_jira_comment(ticket_id: str, payload: JiraCommentRequest, jira_cli
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/tickets/{ticket_id}/comments/internal")
+async def add_jira_internal_comment(ticket_id: str, payload: JiraCommentRequest, jira_client: JiraClient = Depends(get_jira_client)):
+    try:
+        jira_client.add_internal_comment(ticket_id, payload.comment, payload.formatting)
+        return {"message": "Internal comment added successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.put("/tickets/{ticket_id}")
 async def close_jira_ticket(ticket_id: str, payload: JiraCloseRequest, jira_client: JiraClient = Depends(get_jira_client)):
     try:

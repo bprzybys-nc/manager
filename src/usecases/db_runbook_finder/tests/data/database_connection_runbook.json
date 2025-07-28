@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "title": "Database Connection Troubleshooting Runbook",
+    "space_key": "RUNBOOKS",
+    "page_id": "123456",
+    "url": "https://company.atlassian.net/wiki/spaces/RUNBOOKS/pages/123456",
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-20T14:45:00Z",
+    "tags": ["database", "troubleshooting", "connection", "timeout", "postgresql", "mysql"]
+  },
+  "procedures": [
+    {
+      "step": 1,
+      "description": "Check database service status",
+      "command": "systemctl status postgresql",
+      "expected_result": "Service should be active (running)"
+    },
+    {
+      "step": 2,
+      "description": "Verify database connectivity from application server",
+      "command": "telnet db-server 5432",
+      "expected_result": "Connection should establish successfully"
+    },
+    {
+      "step": 3,
+      "description": "Check database logs for connection errors",
+      "command": "tail -f /var/log/postgresql/postgresql.log",
+      "expected_result": "Look for connection refused or timeout errors"
+    },
+    {
+      "step": 4,
+      "description": "Verify connection pool settings",
+      "command": "Check application configuration for max_connections",
+      "expected_result": "Ensure pool size is within database limits"
+    }
+  ],
+  "troubleshooting_steps": [
+    {
+      "symptom": "Connection timeout errors",
+      "possible_causes": ["Network latency", "Database overload", "Connection pool exhaustion"],
+      "resolution": "Increase connection timeout, optimize queries, scale database"
+    },
+    {
+      "symptom": "Authentication failures",
+      "possible_causes": ["Invalid credentials", "User permissions", "SSL configuration"],
+      "resolution": "Verify user credentials, check database user permissions, validate SSL certificates"
+    },
+    {
+      "symptom": "Too many connections error",
+      "possible_causes": ["Connection pool misconfiguration", "Connection leaks", "High traffic"],
+      "resolution": "Adjust max_connections, fix connection leaks, implement connection pooling"
+    }
+  ],
+  "prerequisites": [
+    "Database server access",
+    "Application server access",
+    "Network connectivity between servers",
+    "Database administrator privileges"
+  ],
+  "raw_content": "# Database Connection Troubleshooting\n\nThis runbook provides step-by-step procedures for diagnosing and resolving database connection issues in production environments.\n\n## Common Symptoms\n- Connection timeouts\n- Authentication failures\n- Too many connections errors\n- Intermittent connectivity issues\n\n## Prerequisites\nEnsure you have the necessary access and tools before proceeding with troubleshooting.\n\n## Troubleshooting Procedures\nFollow these steps systematically to identify and resolve database connection issues.",
+  "structured_sections": {
+    "overview": "Comprehensive guide for troubleshooting database connectivity issues",
+    "scope": "PostgreSQL and MySQL database connections",
+    "severity": "Critical - impacts application availability",
+    "estimated_time": "15-30 minutes"
+  }
+}

@@ -26,6 +26,13 @@ dependencies = [
     # Database decommissioning use case dependencies
     "psutil>=6.1.0",
     "python-dotenv>=1.0.0",
+    # Jira tool dependencies
+    "jira>=3.6.0",
+    # ChromaDB/Vector store dependencies
+    "chromadb>=0.4.0",
+    "sentence-transformers>=2.2.0",
+    "beautifulsoup4>=4.12.0",
+    "atlassian-python-api>=3.41.0",
 ]
 
 [dependency-groups]

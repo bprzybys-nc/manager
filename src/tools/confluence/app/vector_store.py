@@ -310,15 +310,15 @@ class VectorStore:
         self, query: str, n_results: int = 5, filters: Optional[Dict[str, Any]] = None
     ) -> List[SearchResult]:
         """
-        Search runbooks using semantic similarity with optional metadata filters.
+        Search runbooks using semantic similarity with runbook-level aggregation.
 
         Args:
             query: Search query text
-            n_results: Maximum number of results to return
+            n_results: Maximum number of runbooks to return
             filters: Optional metadata filters (e.g., {"space_key": "PROD", "author": "admin"})
 
         Returns:
-            List of SearchResult objects ordered by relevance
+            List of SearchResult objects ordered by relevance (aggregated by runbook)
 
         Raises:
             ValueError: If query is invalid
@@ -334,10 +334,18 @@ class VectorStore:
             # Generate query embedding
             query_embedding = self._generate_embeddings(query.strip())
 
-            # Prepare search parameters
+            # Prepare search parameters - get more chunks to enable proper aggregation
+            collection_count = self._collection.count()
+            if collection_count == 0:
+                # Return empty results for empty collection
+                return []
+                
+            # Get more chunks than requested runbooks to ensure good aggregation
+            search_chunk_limit = min(50, collection_count)
+                
             search_params = {
                 "query_embeddings": [query_embedding],
-                "n_results": min(n_results, self._collection.count()),
+                "n_results": search_chunk_limit,
                 "include": ["documents", "metadatas", "distances"],
             }
 
@@ -355,8 +363,8 @@ class VectorStore:
             # Perform similarity search
             results = self._collection.query(**search_params)
 
-            # Process results
-            search_results = []
+            # Aggregate results by runbook
+            runbook_aggregates = {}
 
             if results["ids"] and results["ids"][0]:
                 for i in range(len(results["ids"][0])):
@@ -364,24 +372,97 @@ class VectorStore:
                     document = results["documents"][0][i]
                     metadata = results["metadatas"][0][i]
                     distance = results["distances"][0][i]
+                    runbook_id = metadata["runbook_id"]
 
                     # Convert distance to similarity score (0-1, higher is better)
-                    relevance_score = max(0.0, 1.0 - distance)
-
-                    # Create SearchResult
-                    search_result = SearchResult(
-                        runbook_id=metadata["runbook_id"],
-                        chunk_id=chunk_id,
-                        content=document,
-                        relevance_score=relevance_score,
-                        metadata=self._metadata_dict_to_runbook_metadata(metadata),
+                    # ChromaDB uses cosine distance, so we convert to cosine similarity
+                    # Cosine distance = 1 - cosine similarity, so similarity = 1 - distance
+                    # But ChromaDB might use squared distance, so we need to handle larger values
+                    if distance > 2.0:
+                        # If distance > 2, likely using squared cosine or different metric
+                        raw_similarity = max(0.0, 1.0 / (1.0 + distance))
+                    else:
+                        # Standard cosine distance conversion
+                        raw_similarity = max(0.0, 1.0 - (distance / 2.0))
+                    
+                    # Apply research-based relevance enhancement
+                    similarity_score = self._enhance_relevance_score(
+                        query.strip(), document, raw_similarity
                     )
 
-                    search_results.append(search_result)
+                    if runbook_id not in runbook_aggregates:
+                        runbook_aggregates[runbook_id] = {
+                            'metadata': self._metadata_dict_to_runbook_metadata(metadata),
+                            'chunks': [],
+                            'scores': [],
+                            'best_chunk': None,
+                            'best_score': 0.0
+                        }
+
+                    # Add chunk info
+                    chunk_info = {
+                        'chunk_id': chunk_id,
+                        'content': document,
+                        'score': similarity_score,
+                        'chunk_index': metadata.get('chunk_index', 0)
+                    }
+                    
+                    runbook_aggregates[runbook_id]['chunks'].append(chunk_info)
+                    runbook_aggregates[runbook_id]['scores'].append(similarity_score)
+                    
+                    # Track best chunk for this runbook
+                    if similarity_score > runbook_aggregates[runbook_id]['best_score']:
+                        runbook_aggregates[runbook_id]['best_score'] = similarity_score
+                        runbook_aggregates[runbook_id]['best_chunk'] = chunk_info
+
+            # Calculate aggregate scores and create final results
+            search_results = []
+            
+            for runbook_id, agg_data in runbook_aggregates.items():
+                if not agg_data['scores']:
+                    continue
+                    
+                # Calculate aggregate relevance score using multiple methods
+                scores = agg_data['scores']
+                max_score = max(scores)
+                avg_score = sum(scores) / len(scores)
+                
+                # Weighted combination: emphasize best match but consider breadth
+                # Formula: 70% best match + 30% average of all matches
+                aggregate_score = (0.7 * max_score) + (0.3 * avg_score)
+                
+                # Sort chunks by relevance for this runbook
+                agg_data['chunks'].sort(key=lambda x: x['score'], reverse=True)
+                
+                # Create aggregated SearchResult using best chunk content but aggregate score
+                best_chunk = agg_data['best_chunk']
+                if best_chunk is None:
+                    continue  # Skip if no valid chunks found
+                    
+                search_result = SearchResult(
+                    runbook_id=runbook_id,
+                    chunk_id=best_chunk['chunk_id'],
+                    content=best_chunk['content'],
+                    relevance_score=aggregate_score,
+                    metadata=agg_data['metadata'],
+                )
+                
+                # Add aggregation metadata for display
+                search_result._chunk_count = len(agg_data['chunks'])
+                search_result._max_chunk_score = max_score
+                search_result._avg_chunk_score = avg_score
+                search_result._supporting_chunks = agg_data['chunks'][:3]  # Top 3 chunks
+                
+                search_results.append(search_result)
+
+            # Sort by aggregate relevance score and limit to requested count
+            search_results.sort(key=lambda x: x.relevance_score, reverse=True)
+            search_results = search_results[:n_results]
 
             filter_info = f" with filters {filters}" if filters else ""
             logger.info(
-                f"Search for '{query}'{filter_info} returned {len(search_results)} results"
+                f"Search for '{query}'{filter_info} returned {len(search_results)} runbooks "
+                f"(aggregated from {len(runbook_aggregates)} runbooks)"
             )
             return search_results
 
@@ -700,6 +781,50 @@ class VectorStore:
         except Exception as e:
             logger.error(f"Vector database health check failed: {e}")
             return False
+
+    def _enhance_relevance_score(self, query: str, content: str, base_score: float) -> float:
+        """
+        Research-based relevance score enhancement.
+        
+        Based on ChromaDB best practices:
+        - 0.7+ = High relevance
+        - 0.5-0.7 = Moderate relevance  
+        - <0.5 = Low relevance
+        
+        Enhancement strategies:
+        1. Keyword overlap boosting for database terms
+        2. Domain-specific terminology recognition
+        
+        Args:
+            query: User search query
+            content: Document content
+            base_score: Original ChromaDB cosine similarity score
+            
+        Returns:
+            Enhanced relevance score (0.0-1.0)
+        """
+        # Domain-specific keyword boosting
+        db_keywords = [
+            "database", "connection", "timeout", "performance", "backup", "recovery",
+            "sql", "query", "index", "table", "schema", "migration", "replication",
+            "monitoring", "troubleshooting", "optimization", "tuning", "memory",
+            "disk", "storage", "maintenance", "patch", "upgrade", "configuration"
+        ]
+        
+        query_lower = query.lower()
+        content_lower = content.lower()
+        
+        # Count keyword matches between query and content
+        keyword_matches = sum(1 for keyword in db_keywords 
+                            if keyword in query_lower and keyword in content_lower)
+        
+        # Apply keyword boost (5% per matching keyword, max 20%)
+        keyword_boost = min(keyword_matches * 0.05, 0.20)
+        
+        # Enhanced score with boosting
+        enhanced_score = min(base_score + keyword_boost, 1.0)
+        
+        return enhanced_score
 
     def _metadata_dict_to_runbook_metadata(self, metadata_dict: Dict[str, Any]):
         """

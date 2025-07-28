@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "title": "Database Migration and Schema Changes",
+    "space_key": "RUNBOOKS",
+    "page_id": "567890",
+    "url": "https://company.atlassian.net/wiki/spaces/RUNBOOKS/pages/567890",
+    "created_at": "2024-01-12T14:20:00Z",
+    "updated_at": "2024-02-05T10:15:00Z",
+    "tags": ["database", "migration", "schema", "deployment", "version-control", "rollback"]
+  },
+  "procedures": [
+    {
+      "step": 1,
+      "description": "Backup database before migration",
+      "command": "pg_dump -h localhost -U postgres production > pre_migration_backup.sql",
+      "expected_result": "Complete database backup created successfully"
+    },
+    {
+      "step": 2,
+      "description": "Validate migration scripts on staging environment",
+      "command": "psql -h staging-db -U postgres -d staging_db < migration_script.sql",
+      "expected_result": "Migration executes successfully without errors"
+    },
+    {
+      "step": 3,
+      "description": "Execute migration with transaction rollback capability",
+      "command": "BEGIN; \\i migration_script.sql; -- Review results, then COMMIT or ROLLBACK;",
+      "expected_result": "Migration applied within transaction for safe rollback"
+    },
+    {
+      "step": 4,
+      "description": "Verify data integrity after migration",
+      "command": "SELECT COUNT(*) FROM critical_table; -- Compare with pre-migration counts",
+      "expected_result": "Data counts match expected values post-migration"
+    }
+  ],
+  "troubleshooting_steps": [
+    {
+      "symptom": "Migration script fails with syntax errors",
+      "possible_causes": ["SQL syntax issues", "Version incompatibility", "Missing dependencies"],
+      "resolution": "Review and fix SQL syntax, ensure version compatibility, install required extensions"
+    },
+    {
+      "symptom": "Data integrity issues after migration",
+      "possible_causes": ["Incomplete data transformation", "Constraint violations", "Referential integrity issues"],
+      "resolution": "Validate data transformations, check constraints, fix foreign key relationships"
+    },
+    {
+      "symptom": "Performance degradation after schema changes",
+      "possible_causes": ["Missing indexes", "Query plan changes", "Lock contention"],
+      "resolution": "Add necessary indexes, analyze query plans, optimize migration timing"
+    }
+  ],
+  "prerequisites": [
+    "Database migration scripts tested",
+    "Staging environment available", 
+    "Application deployment coordination",
+    "Rollback procedures documented"
+  ],
+  "raw_content": "# Database Migration Procedures\n\nStructured approach to safely executing database schema changes and data migrations.\n\n## Migration Types\n- Schema changes (DDL)\n- Data migrations (DML)\n- Index creation/modification\n- Constraint additions/removals\n- Stored procedure updates\n\n## Safety Measures\n- Comprehensive testing on staging\n- Transaction-based execution\n- Automated rollback procedures\n- Data validation checks\n- Performance impact assessment\n\n## Deployment Coordination\n- Application code compatibility\n- Blue-green deployment strategies\n- Zero-downtime migration techniques\n- Monitoring and alerting during migration",
+  "structured_sections": {
+    "overview": "Safe database migration and schema change procedures",
+    "scope": "Production database deployments",
+    "severity": "High - potential system impact",
+    "estimated_time": "30-180 minutes depending on migration complexity"
+  }
+}

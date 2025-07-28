@@ -18,7 +18,9 @@ The Ovora Manager Context Engineering System is a comprehensive framework design
    - `graphmcp_workflow_patterns.py`: GraphMCP workflow patterns and implementations
    - `microservices_patterns.py`: Microservice tool patterns (Confluence, Jira, etc.)
    - `ai_integration_patterns.py`: Azure OpenAI and LangChain patterns
+   - `slack_integration_patterns.py`: Comprehensive Slack API integration patterns
    - `testing_patterns.py`: Comprehensive testing strategies
+   - `db_runbook_finder_success_patterns.md`: Production-ready workflow success patterns
 
 3. **Templates System** (`templates/`)
    - `feature_request_template.md`: Manager-specific feature request template
