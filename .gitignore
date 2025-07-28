@@ -11,6 +11,8 @@ dist/
 .venv/
 venv/
 
+chroma/
+
 # JetBrains IDEs
 .idea/
 *.iml
