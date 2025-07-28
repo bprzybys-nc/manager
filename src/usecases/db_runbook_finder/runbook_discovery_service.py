@@ -142,13 +142,13 @@ class RunbookDiscoveryService:
         logger.debug(f"Page '{title}' does not match any runbook patterns")
         return False
     
-    def discover_runbooks_from_root(self, root_url: str, max_depth: int = 3) -> List[RunbookContent]:
+    def discover_runbooks_from_root(self, root_url: str, max_depth: int = 5) -> List[RunbookContent]:
         """
         Simple hierarchical traversal discovery from a root URL.
         
         Args:
             root_url: Root Confluence page URL to start discovery from
-            max_depth: Maximum depth to traverse (default: 3)
+            max_depth: Maximum depth to traverse (default: 5)
             
         Returns:
             List of discovered RunbookContent objects
